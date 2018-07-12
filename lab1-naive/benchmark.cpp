@@ -8,10 +8,3 @@ int baseline_add(size_t size, double A[], double B[], double C[]) {
 
 
 
-int openmp_add(size_t size, double A[], double B[], double C[]) {
-#pragma omp parallel for
-  for (size_t i = 0; i < size; ++i) {
-    C[i] = B[i] + A[i];
-  }
-}
-
