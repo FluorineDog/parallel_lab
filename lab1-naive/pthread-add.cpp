@@ -1,6 +1,7 @@
 #include <thread>
 #include <vector>
-int pthread_add(size_t size, double A[], double B[], double C[]) {
+#include "common.h"
+void pthread_add(size_t size, double A[], double B[], double C[]) {
   std::vector<std::thread> threads;
   int thread_num = std::thread::hardware_concurrency();
   for (int t_id = 0; t_id < thread_num; ++t_id) {
@@ -14,10 +15,12 @@ int pthread_add(size_t size, double A[], double B[], double C[]) {
         },
         beg, end, A, B, C);
   }
+  for (auto& th : threads) {
+    th.join();
+  }
 }
 
-#include "common.h"
-int main(){
+int main() {
   EXEC(pthread_add);
   return 0;
 }
