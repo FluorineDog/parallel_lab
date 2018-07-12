@@ -19,7 +19,7 @@ void execute(std::string name, std::function<functor_t> func) {
   auto end_time = high_resolution_clock::now();
   auto time =
       duration_cast<duration<double, std::milli>>(end_time - beg_time).count();
-  std::cout << name << ": " << time << " ms";
+  std::cout << name << ":\t" << time << " ms" << std::endl;
 }
 
 #define EXEC(functor) execute(#functor, functor)
