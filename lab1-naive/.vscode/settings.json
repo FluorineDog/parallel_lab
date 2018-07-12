@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "*.cu": "cpp",
+    "*.decaf": "java",
+    "*.c0": "cpp",
+    "*.ll": "lex",
+    "*.h0": "cpp",
+    "chrono": "cpp"
+  }
+}
