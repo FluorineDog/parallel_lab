@@ -14,7 +14,7 @@ typedef void functor_t(size_t size, double A[], double B[], double C[]);
 
 void execute(std::string name, std::function<functor_t> func) {
   std::default_random_engine e;
-  // std::uniform_real_distribution<> dist(-1.0, 1.0);
+  std::uniform_real_distribution<> dist(-1.0, 1.0);
   constexpr size_t SIZE = 1 << 27;
   constexpr size_t REPEAT = 5;
   // std::array<double, SIZE> A, B, C;
@@ -23,8 +23,8 @@ void execute(std::string name, std::function<functor_t> func) {
   auto C = std::make_unique<double[]>(SIZE);
   #pragma omp parallel for
   for (size_t i = 0; i < SIZE; ++i) {
-    A[i] = 1.0;
-    B[i] = 0.9;
+    A[i] = 1.0 * i / SIZE;
+    B[i] = 0.9 * i / SIZE;
   }
 
   // warm up
