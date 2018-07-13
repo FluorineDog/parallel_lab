@@ -6,13 +6,13 @@ using namespace std;
 int main() {
   const int KernelWidth = 10;
   const int TileWidth = 10;
-  Mat srcImage = imread("data/graypicture.png", CV_LOAD_IMAGE_GRAYSCALE);
+  Mat srcImage = imread("data/lena.png", CV_LOAD_IMAGE_GRAYSCALE);
   try {
     imshow("original picture", srcImage);
   } catch (cv::Exception& ex) {
     fprintf(stderr, "Exception converting image to PNG format: %s\n",
             ex.what());
-    // getchar();
+    getchar();
     return -1;
   }
   cout << "cols:" << srcImage.cols << " rows:" << srcImage.rows << endl;
@@ -27,6 +27,6 @@ int main() {
   }
   imshow("eroded picture all", dstImage);
   waitKey(0);
-  // getchar();
+  getchar();
   return 0;
 }
