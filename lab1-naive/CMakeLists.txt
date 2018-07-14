@@ -25,3 +25,6 @@ set_target_properties(mpi-add PROPERTIES
 set_target_properties(mpi-add PROPERTIES
   LINK_FLAGS "${MPI_LINK_FLAGS}")
 
+find_package(CUDA REQUIRED)
+cuda_add_executable(cuda-add cuda-add.cu)
+
