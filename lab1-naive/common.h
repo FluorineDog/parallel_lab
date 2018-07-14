@@ -15,7 +15,7 @@ using std::cerr;
 using namespace std::chrono;
 typedef void functor_t(size_t size, float A[], float B[], float C[]);
 
-constexpr size_t SIZE = 1 << 27;
+constexpr size_t SIZE = 1 << 10;
 void execute(std::string name, std::function<functor_t> func) {
 	std::default_random_engine e;
 	std::uniform_real_distribution<> dist(-1.0, 1.0);
@@ -53,7 +53,7 @@ void execute(std::string name, std::function<functor_t> func) {
 	time /= 30;
 
 	std::cout << name << ":\t" << time << " ms";
-	auto signature = boost::hash_range(B.get(), B.get() + SIZE);
+	auto signature = std::accumulate(B.get(), B.get() + SIZE, 0.0,  [](auto a, auto b){return a + b;});
 	cout << " " << std::hex  << signature;
 	cout << std::endl;
 }
