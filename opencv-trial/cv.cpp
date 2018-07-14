@@ -12,9 +12,9 @@ void erode_baseline(Mat& dst, Mat& src, Mat& kernel) {
 			int len_col = std::min(kernel.cols, src.cols - base_col);
 			uint8_t pixel = 255;
 			auto anchor = src.data + base_row * src.cols + base_col;
-#pragma unroll
+#pragma unroll(10)
 			for (int ki = 0; ki < len_row; ++ki) {
-#pragma unroll
+#pragma unroll(10)
 				for (int kj = 0; kj < len_col; ++kj) {
 					if (kernel.data[ki * base_col + kj]) {
 						pixel = std::min(pixel, anchor[ki * src.cols + kj]);
