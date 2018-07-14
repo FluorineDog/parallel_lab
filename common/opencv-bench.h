@@ -54,8 +54,8 @@ void execute_cv(std::string name,  //
       duration_cast<duration<double, std::milli>>(mid_time - beg_time).count();
   auto exec_time =
       duration_cast<duration<double, std::milli>>(end_time - mid_time).count();
-  cout << "baseline:\t" << base_time << endl;
-  cout << name << ":\t" << exec_time << endl;
+  cout << "baseline:\t" << base_time << "ms" << endl;
+  cout << name << ":\t" << exec_time << "ms" << endl;
 
   imshow("baseline", dst_image);
   imshow("executed", dst_ref);
