@@ -22,7 +22,7 @@ constexpr size_t SIZE = 1 << 27;
 void execute(std::string name, std::function<functor_t> func) {
   std::default_random_engine e;
   std::uniform_real_distribution<> dist(-1.0, 1.0);
-  constexpr size_t REPEAT = 5;
+  constexpr size_t REPEAT = 2;
   // std::array<float, SIZE> A, B, C;
   auto A = std::make_unique<float[]>(SIZE);
   auto B = std::make_unique<float[]>(SIZE);
@@ -53,11 +53,10 @@ void execute(std::string name, std::function<functor_t> func) {
   }
   auto time =
       duration_cast<duration<double, std::milli>>(end_time - beg_time).count();
-  time /= 30;
+  time /= REPEAT*3;
   
   std::cout << name << ":\t" << time << " ms";
   auto signature = boost::hash_range(B.get(), B.get() + SIZE);
-//	auto signature = std::accumulate(B.get(), B.get() + SIZE, 0.0,  [](auto a, auto b){return a + b;});
   cout << " => " << std::hex <<  signature;
   cout << std::endl;
 }

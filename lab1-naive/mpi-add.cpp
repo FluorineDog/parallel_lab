@@ -7,7 +7,7 @@ auto buffer_b = std::make_unique<float[]>(BUFFER_SIZE);
 
 void mpi_add(size_t size, float A[], float B[], float C[]) {
   MPI_Bcast(&size, 1, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD);
-  cerr << std::hex << size << endl;
+//  cerr << std::hex << size << endl;
 	int concurrency;
 	int rank;
 	MPI_Comm_size(MPI_COMM_WORLD, &concurrency);
@@ -31,7 +31,7 @@ void mpi_slave() {
 	while (true) {
     size_t size;
     MPI_Bcast(&size, 1, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD);
-    cerr << std::hex << size << endl;
+//    cerr << std::hex << size << endl;
     if(size == 0){
       break;
     }
