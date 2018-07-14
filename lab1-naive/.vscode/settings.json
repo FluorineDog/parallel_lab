@@ -5,6 +5,10 @@
     "*.c0": "cpp",
     "*.ll": "lex",
     "*.h0": "cpp",
-    "chrono": "cpp"
+    "chrono": "cpp",
+    "array": "cpp",
+    "initializer_list": "cpp",
+    "utility": "cpp",
+    "string_view": "cpp"
   }
 }
