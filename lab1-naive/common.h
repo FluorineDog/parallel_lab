@@ -13,17 +13,17 @@ using std::endl;
 using std::cerr;
 
 using namespace std::chrono;
-typedef void functor_t(size_t size, double A[], double B[], double C[]);
+typedef void functor_t(size_t size, float A[], float B[], float C[]);
 
 constexpr size_t SIZE = 1 << 27;
 void execute(std::string name, std::function<functor_t> func) {
 	std::default_random_engine e;
 	std::uniform_real_distribution<> dist(-1.0, 1.0);
 	constexpr size_t REPEAT = 5;
-	// std::array<double, SIZE> A, B, C;
-	auto A = std::make_unique<double[]>(SIZE);
-	auto B = std::make_unique<double[]>(SIZE);
-	auto C = std::make_unique<double[]>(SIZE);
+	// std::array<float, SIZE> A, B, C;
+	auto A = std::make_unique<float[]>(SIZE);
+	auto B = std::make_unique<float[]>(SIZE);
+	auto C = std::make_unique<float[]>(SIZE);
 #pragma omp parallel for
 	for (size_t i = 0; i < SIZE; ++i) {
 		A[i] = 1.0 * i / SIZE;
@@ -45,7 +45,7 @@ void execute(std::string name, std::function<functor_t> func) {
 	auto end_time = high_resolution_clock::now();
 	{
 		// never executable
-		double value = C[e() % SIZE];
+		float value = C[e() % SIZE];
 		if (value > 1.0e100) exit(-1);
 	}
 	auto time =

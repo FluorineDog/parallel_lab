@@ -1,3 +1,5 @@
+.*
 **/build
 **/samples
-
+**/cmake-build*
+!**/.gitignore
