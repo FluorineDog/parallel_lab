@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
-project(naive)
+project(lab2)
+find_package( OpenCV REQUIRED )
 
-add_executable(baseline baseline.cpp)
-add_executable(pthread-add pthread-add.cpp)
-target_link_libraries(pthread-add pthread)
+add_executable(pthread-erode pthread-erode.cpp)
+target_link_libraries(pthread-erode pthread ${OpenCV_LIBS} )

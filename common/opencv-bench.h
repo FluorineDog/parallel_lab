@@ -39,7 +39,7 @@ void execute_cv(std::string name,  //
   const int KernelWidth = 10;
   const int TileWidth = 10;
   Mat dst_image, dst_ref;
-  Mat src_image = imread("data/lena.png", CV_LOAD_IMAGE_GRAYSCALE);
+  Mat src_image = imread("/home/mike/workspace/parallel_lab/data/lena.png", CV_LOAD_IMAGE_GRAYSCALE);
   // try {
   imshow("original picture", src_image);
   cout << "cols:" << src_image.cols << " rows:" << src_image.rows << endl;
