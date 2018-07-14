@@ -44,11 +44,12 @@ void execute_cv(std::string name,  //
   imshow("original picture", src_image);
   cout << "cols:" << src_image.cols << " rows:" << src_image.rows << endl;
   Mat element = getStructuringElement(MORPH_RECT, Size(10, 10));
+  dst_ref = src_image.clone();
   dst_image = src_image.clone();
   auto beg_time = high_resolution_clock::now();
-  erode_baseline(src_image, dst_image, element);
+  erode_baseline(src_image, dst_ref, element);
   auto mid_time = high_resolution_clock::now();
-  func(src_image, dst_ref, element);
+  func(src_image, dst_image, element);
   auto end_time = high_resolution_clock::now();
   auto base_time =
       duration_cast<duration<double, std::milli>>(mid_time - beg_time).count();
@@ -57,8 +58,8 @@ void execute_cv(std::string name,  //
   cout << "baseline:\t" << base_time << "ms" << endl;
   cout << name << ":\t" << exec_time << "ms" << endl;
 
-  imshow("baseline", dst_image);
-  imshow("executed", dst_ref);
+  imshow("baseline", dst_ref);
+  imshow("executed", dst_image);
   waitKey(0);
   // } catch (cv::Exception& ex) {
   // 	cout << "cv Exception:" << ex.what();

@@ -30,6 +30,6 @@ void erode_ref(Mat& src, Mat& dst, Mat& kernel) {
 
 
 int main() {
-  EXEC_CV(erode_ref);
+  EXEC_CV(erode_pthread);
   return 0;
 }
