@@ -1,27 +1,28 @@
 #include <mpi.h>
 #include "common.h"
-auto buffer_a = std::make_unique<double[]>(1 << 25);
-auto buffer_b = std::make_unique<double[]>(1 << 25);
-auto buffer_c = std::make_unique<double[]>(1 << 25);
+constexpr size_t BUFFER_SIZE = 1 << 26;
+auto buffer_a = std::make_unique<double[]>(BUFFER_SIZE);
+auto buffer_b = std::make_unique<double[]>(BUFFER_SIZE);
+auto buffer_c = std::make_unique<double[]>(BUFFER_SIZE);
+
 void mpi_add(size_t size, double A[], double B[], double C[]) {
-	assert(size <= (1 << 27));
   MPI_Bcast(&size, 1, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD);
-  cerr << size;
+  cerr << std::hex << size << endl;
 	int concurrency;
 	int rank;
 	MPI_Comm_size(MPI_COMM_WORLD, &concurrency);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	size_t beg = size * rank / concurrency;
-	size_t end = size * (rank + 1) / concurrency;
-	MPI_Scatter(A, size, MPI_DOUBLE, buffer_a.get(), end - beg, MPI_DOUBLE, 0,
+  size_t len = size / concurrency;
+	assert(size % concurrency == 0);
+	assert(len <= BUFFER_SIZE);
+	MPI_Scatter(A, len, MPI_DOUBLE, buffer_a.get(), len, MPI_DOUBLE, 0,
 							MPI_COMM_WORLD);
-	MPI_Scatter(B, size, MPI_DOUBLE, buffer_b.get(), end - beg, MPI_DOUBLE, 0,
+	MPI_Scatter(B, len, MPI_DOUBLE, buffer_b.get(), len, MPI_DOUBLE, 0,
 							MPI_COMM_WORLD);
-	for (size_t i = beg; i < end; ++i) {
+	for (size_t i = 0; i < len; ++i) {
 		buffer_c[i] = buffer_b[i] + buffer_a[i];
 	}
-
-	MPI_Gather(buffer_c.get(), end - beg, MPI_DOUBLE, C, size, MPI_DOUBLE, 0,
+	MPI_Gather(buffer_c.get(), len, MPI_DOUBLE, C, len, MPI_DOUBLE, 0,
 						 MPI_COMM_WORLD);
 }
 
@@ -30,24 +31,24 @@ void mpi_slave() {
 	while (true) {
     size_t size;
     MPI_Bcast(&size, 1, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD);
-    cerr << size;
-
+    cerr << std::hex << size << endl;
+    if(size == 0){
+      break;
+    }
 		int concurrency;
 		int rank;
 		MPI_Comm_size(MPI_COMM_WORLD, &concurrency);
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-		size_t beg = size * rank / concurrency;
-		size_t end = size * (rank + 1) / concurrency;
+    size_t len = size / concurrency;
 
-		MPI_Scatter(nullptr, size, MPI_DOUBLE, buffer_a.get(), end - beg,
+		MPI_Scatter(nullptr, len, MPI_DOUBLE, buffer_a.get(), len,
 								MPI_DOUBLE, 0, MPI_COMM_WORLD);
-		MPI_Scatter(nullptr, size, MPI_DOUBLE, buffer_b.get(), end - beg,
+		MPI_Scatter(nullptr, len, MPI_DOUBLE, buffer_b.get(), len,
 								MPI_DOUBLE, 0, MPI_COMM_WORLD);
-		for (size_t i = beg; i < end; ++i) {
+		for (size_t i = 0; i < len; ++i) {
 			buffer_c[i] = buffer_b[i] + buffer_a[i];
 		}
-
-		MPI_Gather(buffer_c.get(), end - beg, MPI_DOUBLE, nullptr, size, MPI_DOUBLE,
+		MPI_Gather(buffer_c.get(), len, MPI_DOUBLE, nullptr, len, MPI_DOUBLE,
 							 0, MPI_COMM_WORLD);
 	}
 }
@@ -61,6 +62,8 @@ int main() {
 	if (rank == 0) {
 		MPI_Barrier(MPI_COMM_WORLD);
 		EXEC(mpi_add);
+    size_t size = 0;
+    MPI_Bcast(&size, 1, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD);
 	} else {
 		MPI_Barrier(MPI_COMM_WORLD);
 		mpi_slave();

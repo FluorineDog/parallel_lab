@@ -10,11 +10,12 @@
 using std::cin;
 using std::cout;
 using std::endl;
+using std::cerr;
 
 using namespace std::chrono;
 typedef void functor_t(size_t size, double A[], double B[], double C[]);
 
-constexpr size_t SIZE = 1 << 25;
+constexpr size_t SIZE = 1 << 27;
 void execute(std::string name, std::function<functor_t> func) {
 	std::default_random_engine e;
 	std::uniform_real_distribution<> dist(-1.0, 1.0);

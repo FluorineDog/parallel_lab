@@ -10,6 +10,10 @@
     "initializer_list": "cpp",
     "utility": "cpp",
     "string_view": "cpp",
-    "type_traits": "cpp"
+    "type_traits": "cpp",
+    "bitset": "cpp",
+    "functional": "cpp",
+    "istream": "cpp",
+    "tuple": "cpp"
   }
 }
