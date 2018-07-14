@@ -25,6 +25,6 @@ void erode_pthread(Mat& src, Mat& dst, Mat& kernel) {
 
 
 int main() {
-  EXEC_CV(erode_pthread);
+  EXEC_CV(erode);
   return 0;
 }
