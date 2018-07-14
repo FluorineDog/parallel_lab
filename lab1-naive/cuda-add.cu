@@ -7,7 +7,7 @@
 __global__ void VecAdd(float* A, float* B)
 {
   size_t i = threadIdx.x +  blockDim.x * blockIdx.x;
-  A[i] = i;
+  A[i] = A[i] + B[i];
 }
 
 float *devA;
@@ -15,11 +15,10 @@ float *devB;
 
 void cuda_add(size_t size, float A[], float B[], float C[]) {
   assert(size <= SIZE);
-  ::cudaMemcpy(devA, A, size, cudaMemcpyHostToDevice);
-  ::cudaMemcpy(devB, B, size, cudaMemcpyHostToDevice);
-  cout << size / 1024 << endl;
-  VecAdd<<< size/1024, 1024 >>>(devA, devB);
-  ::cudaMemcpy(C, devA, size, cudaMemcpyDeviceToHost);
+  ::cudaMemcpy(devA, A, size * sizeof(float), cudaMemcpyHostToDevice);
+  ::cudaMemcpy(devB, B, size * sizeof(float), cudaMemcpyHostToDevice);
+  VecAdd<<< (size/256), 256 >>>(devA, devB);
+  ::cudaMemcpy(C, devA, size * sizeof(float), cudaMemcpyDeviceToHost);
 }
 
 int main() {
