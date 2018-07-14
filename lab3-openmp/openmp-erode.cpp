@@ -2,7 +2,8 @@
 #include <vector>
 #include "../common/opencv-bench.h"
 
-void erode_pthread(Mat& src, Mat& dst, Mat& kernel) {
+void erode_openmp(Mat& src, Mat& dst, Mat& kernel) {
+  #pragma omp parallel for
   for (int base_row = 0; base_row < src.rows; ++base_row) {
     for (int base_col = 0; base_col < src.cols; ++base_col) {
       int len_row = std::min(kernel.rows, src.rows - base_row);
@@ -30,6 +31,6 @@ void erode_ref(Mat& src, Mat& dst, Mat& kernel) {
 
 
 int main() {
-  EXEC_CV(erode_pthread);
+  EXEC_CV(erode_openmp);
   return 0;
 }
