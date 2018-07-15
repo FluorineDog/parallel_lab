@@ -15,7 +15,7 @@ void erode_workload(uint8_t *src, uint8_t *dst, uint8_t *kernel,
                     int beg_r, int end_r,
                     const Config &config
 ) {
-  for (int base_row = 0; base_row < config.rows; ++base_row) {
+  for (int base_row = beg_r; base_row < end_r; ++base_row) {
     for (int base_col = 0; base_col < config.cols; ++base_col) {
       int len_row = std::min(config.kernel_rows, config.rows - base_row);
       int len_col = std::min(config.kernel_cols, config.cols - base_col);
@@ -30,14 +30,13 @@ void erode_workload(uint8_t *src, uint8_t *dst, uint8_t *kernel,
           }
         }
       }
-      dst[base_row * config.cols + base_col] = pixel;
+      dst[(base_row - beg_r) * config.cols + base_col] = pixel;
     }
   }
 }
 
 
 void erode_slave() {
-  MPI_Request handle;
   int concurrency;
   int rank;
   MPI_Comm_size(MPI_COMM_WORLD, &concurrency);
@@ -61,6 +60,7 @@ void erode_slave() {
   MPI_Recv(buffer.get(), src_area, MPI_UINT8_T, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   erode_workload(buffer.get(), dst_buffer.get(), kernel.get(), beg, end, config);
   MPI_Gatherv(dst_buffer.get(), dst_area, MPI_INT8_T, nullptr, nullptr, nullptr, MPI_UINT8_T, 0, MPI_COMM_WORLD);
+  MPI_Barrier(MPI_COMM_WORLD);
 }
 
 void erode_mpi(Mat &src, Mat &dst, Mat &kernel) {
@@ -84,24 +84,26 @@ void erode_mpi(Mat &src, Mat &dst, Mat &kernel) {
   MPI_Bcast(kernel.data, config.kernel_rows * config.kernel_cols, MPI_UINT8_T, 0, MPI_COMM_WORLD);
   std::vector<int> recvcounts;
   std::vector<int> displs;
-  recvcounts.push_back(0);
+  int tid = 0;
+  int beg = tid * rows / concurrency;
+  int end = (tid + 1) * rows / concurrency;
+  recvcounts.push_back((end - beg) * cols);
   displs.push_back(0);
   for (int tid = 1; tid < concurrency; ++tid) {
     // split by line
     int beg = tid * rows / concurrency;
     int end = (tid + 1) * rows / concurrency;
-    displs.push_back(beg);
+    displs.push_back(beg * cols);
     recvcounts.push_back((end - beg) * cols);
     end = std::min(end + 10, rows);
     MPI_Isend(src.data, (end - beg) * cols, MPI_UINT8_T, tid, 1, MPI_COMM_WORLD, &handle);
     MPI_Request_free(&handle);
   }
-  int tid = 0;
-  int beg = tid * rows / concurrency;
-  int end = (tid + 1) * rows / concurrency;
+
   erode_workload(src.data, dst.data, kernel.data, beg, end, config);
   MPI_Gatherv(MPI_IN_PLACE, (end - beg) * cols, MPI_UINT8_T, src.data,
               recvcounts.data(), displs.data(), MPI_UINT8_T, 0, MPI_COMM_WORLD);
+  MPI_Barrier(MPI_COMM_WORLD);
 }
 
 void erode_ref(Mat &src, Mat &dst, Mat &kernel) {
