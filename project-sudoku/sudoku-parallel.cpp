@@ -1,3 +1,6 @@
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -9,6 +12,7 @@
 #include <vector>
 #include "generator/io.inc.h"
 #include <chrono>
+#include <thread>
 using namespace std;
 using namespace std::chrono;
 using std::tuple;
@@ -22,25 +26,36 @@ public:
     return (*this)[row * DIM + col];
   }
   void show() {
-//    constexpr auto str = "_0123456789ABCDEF";
-//    bool flag = true;
-//    for (int row = 0; row < DIM; ++row) {
-//      for (int col = 0; col < DIM; ++col) {
-//        auto value = str[(*this)(row, col)];
-//        cout << value << " ";
-//      }
-//      cout << "$" << endl;
-//    }
-//    cout << endl;
+    constexpr auto str = "_0123456789ABCDEF";
+    bool flag = true;
+    for (int row = 0; row < DIM; ++row) {
+      for (int col = 0; col < DIM; ++col) {
+        auto value = str[(*this)(row, col)];
+        cout << value << " ";
+      }
+      cout << "$" << endl;
+    }
+    cout << endl;
   }
 };
 
 struct Engine {
+  Engine() : succ(false) {}
+  std::mutex m;
   std::list<Grid> candidate;
-  void push(Grid &&g) { candidate.push_back(std::move(g)); }
+  std::condition_variable cv;
+  bool succ;
+
+  void push(Grid &&g) {
+    unique_lock lock(m);
+    candidate.push_back(std::move(g));
+    cv.notify_one();
+  }
   std::optional<Grid> pop() {
-    if (candidate.empty()) {
-      return std::nullopt;
+    unique_lock lock(m);
+    cv.wait(lock, [&] { return succ || !candidate.empty(); });
+    if (succ) {
+      exit(0);
     }
     Grid g = std::move(candidate.back());
     candidate.pop_back();
@@ -78,10 +93,7 @@ void kernel(Grid grid, Engine &eng) {
     for (int col = 0; col < DIM; ++col) {
       int block = row / ORDER * ORDER + col / ORDER;
       auto ele = grid(row, col);
-      if (ele) {
-        set_cell(row, col, ele);
-      }
-    }
+      if (ele) { set_cell(row, col, ele); } }
   }
 
   bool advanced;
@@ -126,12 +138,8 @@ void kernel(Grid grid, Engine &eng) {
   } while (advanced);
 
   if (max_known == -1) {
-    static int count = 100;
-    count--;
+    eng.succ = true;
     grid.show();
-    if (count < 0) {
-      exit(0);
-    }
     return;
   }
   // done
@@ -149,17 +157,29 @@ void kernel(Grid grid, Engine &eng) {
   assert(trial == DIM);
 }
 
-std::optional<Grid> solve(Engine &eng) {
-  while (true) {
+void solve_workload(Engine &eng) {
+  while (!eng.succ) {
     auto grid_opt = eng.pop();
-    if (!grid_opt) {
-      return std::nullopt;
-    }
     auto grid = grid_opt.value();
-
     static int id = 0;
     kernel(std::move(grid), eng);
   }
+}
+
+void solve(Engine &eng) {
+  std::vector<std::thread> threads;
+//  int thread_num = std::thread::hardware_concurrency();
+  int thread_num = 1;
+  for (int t_id = 0; t_id < thread_num; ++t_id) {
+    threads.emplace_back(
+        [&]() { solve_workload(eng); }
+    );
+  }
+  for (auto &th : threads) {
+    th.join();
+  }
+  threads.clear();
+
 }
 
 int main(int argc, char *argv[]) {
@@ -170,10 +190,8 @@ int main(int argc, char *argv[]) {
   read_grid(grid.data());
 
   grid.show();
-  eng.candidate.push_back(grid);
-  solve(eng);
   auto beg_time = high_resolution_clock::now();
-  constexpr int REP = 50;
+  constexpr int REP = 1;
   for (int i = 0; i < REP; ++i) {
     eng.candidate.clear();
     eng.candidate.push_back(grid);
