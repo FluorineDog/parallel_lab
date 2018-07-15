@@ -26,16 +26,16 @@ public:
     return (*this)[row * DIM + col];
   }
   void show() {
-    constexpr auto str = "_0123456789ABCDEF";
-    bool flag = true;
-    for (int row = 0; row < DIM; ++row) {
-      for (int col = 0; col < DIM; ++col) {
-        auto value = str[(*this)(row, col)];
-        cout << value << " ";
-      }
-      cout << "$" << endl;
-    }
-    cout << endl;
+//    constexpr auto str = "_0123456789ABCDEF";
+//    bool flag = true;
+//    for (int row = 0; row < DIM; ++row) {
+//      for (int col = 0; col < DIM; ++col) {
+//        auto value = str[(*this)(row, col)];
+//        cout << value << " ";
+//      }
+//      cout << "$" << endl;
+//    }
+//    cout << endl;
   }
 };
 
@@ -44,18 +44,19 @@ struct Engine {
   std::mutex m;
   std::list<Grid> candidate;
   std::condition_variable cv;
-  bool succ;
+  volatile bool succ;
 
   void push(Grid &&g) {
     unique_lock lock(m);
     candidate.push_back(std::move(g));
+    lock.unlock();
     cv.notify_one();
   }
   std::optional<Grid> pop() {
     unique_lock lock(m);
     cv.wait(lock, [&] { return succ || !candidate.empty(); });
     if (succ) {
-      exit(0);
+      return std::nullopt;
     }
     Grid g = std::move(candidate.back());
     candidate.pop_back();
@@ -93,7 +94,10 @@ void kernel(Grid grid, Engine &eng) {
     for (int col = 0; col < DIM; ++col) {
       int block = row / ORDER * ORDER + col / ORDER;
       auto ele = grid(row, col);
-      if (ele) { set_cell(row, col, ele); } }
+      if (ele) {
+        set_cell(row, col, ele);
+      }
+    }
   }
 
   bool advanced;
@@ -138,8 +142,11 @@ void kernel(Grid grid, Engine &eng) {
   } while (advanced);
 
   if (max_known == -1) {
-    eng.succ = true;
     grid.show();
+    unique_lock lk(eng.m);
+    eng.succ = true;
+    lk.unlock();
+    eng.cv.notify_all();
     return;
   }
   // done
@@ -160,6 +167,7 @@ void kernel(Grid grid, Engine &eng) {
 void solve_workload(Engine &eng) {
   while (!eng.succ) {
     auto grid_opt = eng.pop();
+    if(!grid_opt) return;
     auto grid = grid_opt.value();
     static int id = 0;
     kernel(std::move(grid), eng);
@@ -169,7 +177,7 @@ void solve_workload(Engine &eng) {
 void solve(Engine &eng) {
   std::vector<std::thread> threads;
 //  int thread_num = std::thread::hardware_concurrency();
-  int thread_num = 1;
+  int thread_num = 2;
   for (int t_id = 0; t_id < thread_num; ++t_id) {
     threads.emplace_back(
         [&]() { solve_workload(eng); }
@@ -179,13 +187,13 @@ void solve(Engine &eng) {
     th.join();
   }
   threads.clear();
-
 }
 
 int main(int argc, char *argv[]) {
   assert(argc == 2);
   freopen("/home/mike/workspace/parallel_lab/project-sudoku/data/16grid.txt", "r", stdin);
-  Engine eng;
+  Engine* eng_obj = new Engine;
+  Engine& eng = *eng_obj;
   Grid grid;
   read_grid(grid.data());
 
@@ -193,6 +201,7 @@ int main(int argc, char *argv[]) {
   auto beg_time = high_resolution_clock::now();
   constexpr int REP = 1;
   for (int i = 0; i < REP; ++i) {
+    eng.succ = false;
     eng.candidate.clear();
     eng.candidate.push_back(grid);
     solve(eng);
