@@ -60,38 +60,6 @@ static void solve_recurse(struct solve_context *ctx, const set_t *freedom,
 
 	mask = freedom[r];
 
-#ifndef NO_SOFA
-	/* If we can't determine a cell value, see if set-oriented
-	 * backtracking provides a smaller branching factor.
-	 */
-	if (mask & (mask - 1)) {
-		int set[DIM];
-		int value;
-		int size;
-
-		size = sofa(ctx->problem, freedom, set, &value);
-		if (size >= 0 && size < count_bits(mask)) {
-			bf = size - 1;
-			diff += bf * bf;
-
-			for (i = 0; i < size; i++) {
-				int s = set[i];
-
-				memcpy(new_free, freedom, sizeof(new_free));
-				freedom_eliminate(new_free, s % DIM, s / DIM, value);
-
-				ctx->problem[s] = value;
-				solve_recurse(ctx, new_free, diff);
-				ctx->problem[s] = 0;
-
-				if (ctx->count >= 2) return;
-			}
-
-			return;
-		}
-	}
-#endif
-
 	/* Otherwise, fall back to cell-oriented backtracking. */
 	bf = count_bits(mask) - 1;
 	diff += bf * bf;
@@ -109,6 +77,13 @@ static void solve_recurse(struct solve_context *ctx, const set_t *freedom,
 	ctx->problem[r] = 0;
 }
 
+#include <iostream>
+#include <chrono>
+using std::cout;
+using std::endl;
+using std::cerr;
+using namespace std::chrono;
+
 static int solve(const uint8_t *problem, uint8_t *solution, int *diff) {
 	struct solve_context ctx;
 	set_t freedom[ELEMENTS];
@@ -122,7 +97,7 @@ static int solve(const uint8_t *problem, uint8_t *solution, int *diff) {
 	if (sanity_check(problem, freedom) < 0) return -1;
 
 	solve_recurse(&ctx, freedom, 0);
-
+	
 	/* Calculate a difficulty score */
 	if (diff) {
 		int empty = 0;
