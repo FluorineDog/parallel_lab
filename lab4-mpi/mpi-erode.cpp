@@ -13,7 +13,7 @@ struct Config {
 
 void erode_workload(uint8_t *src, uint8_t *dst, uint8_t *kernel,
                     int beg_r, int end_r,
-                    const Config& config
+                    const Config &config
 ) {
 //   for (int base_row = 0; base_row < src.rows; ++base_row) {
 //     for (int base_col = 0; base_col < src.cols; ++base_col) {
@@ -34,7 +34,6 @@ void erode_workload(uint8_t *src, uint8_t *dst, uint8_t *kernel,
 //     }
 //   }
 }
-
 
 
 void erode_slave() {
@@ -112,10 +111,14 @@ void erode_ref(Mat &src, Mat &dst, Mat &kernel) {
 
 int main() {
   int rank;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  if(rank == 0){
-    EXEC_CV(erode_mpi);
-  }
+  MPI_Init(nullptr, nullptr);
   
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  if (rank == 0) {
+    EXEC_CV(erode_mpi);
+  } else {
+    erode_slave();
+  }
+  MPI_Finalize();
   return 0;
 }
