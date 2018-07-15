@@ -2,7 +2,16 @@
 #include <vector>
 #include "../common/opencv-bench.h"
 
-void erode_pthread(Mat& src, Mat& dst, Mat& kernel) {
+__constant__ uint8_t ck[100];
+
+struct Config {
+    int rows;
+    int cols;
+    int kernel_rows;
+    int kernel_cols;
+};
+
+void erode_cuda(Mat& src, Mat& dst, Mat& kernel) {
   for (int base_row = 0; base_row < src.rows; ++base_row) {
     for (int base_col = 0; base_col < src.cols; ++base_col) {
       int len_row = std::min(kernel.rows, src.rows - base_row);
@@ -23,13 +32,14 @@ void erode_pthread(Mat& src, Mat& dst, Mat& kernel) {
   }
 }
 
-
-void erode_ref(Mat& src, Mat& dst, Mat& kernel) {
-  erode(src, dst, kernel);
+void erode_cuda(Mat& src, Mat& dst, Mat& kernel) {
+  texture<uint8_t, cudatTextureType2D> tex8u; 
+  cudaCreateTextureObject()
+  cudaCreateTextureObject()
 }
 
 
 int main() {
-  EXEC_CV(erode_pthread);
+  EXEC_CV(erode_cuda);
   return 0;
 }
