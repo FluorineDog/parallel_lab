@@ -101,7 +101,7 @@ void erode_mpi(Mat &src, Mat &dst, Mat &kernel) {
   }
 
   erode_workload(src.data, dst.data, kernel.data, beg, end, config);
-  MPI_Gatherv(MPI_IN_PLACE, (end - beg) * cols, MPI_UINT8_T, src.data,
+  MPI_Gatherv(dst.data, (end - beg) * cols, MPI_UINT8_T, src.data,
               recvcounts.data(), displs.data(), MPI_UINT8_T, 0, MPI_COMM_WORLD);
   MPI_Barrier(MPI_COMM_WORLD);
 }
