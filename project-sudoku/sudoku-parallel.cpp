@@ -41,11 +41,24 @@ public:
 
 struct Engine {
   Engine() : succ(false) {}
-  std::mutex m;
+private:
   std::list<Grid> candidate;
+  std::mutex m;
   std::condition_variable cv;
   volatile bool succ;
-
+public:
+  void set_succ(){
+        unique_lock lk(m);
+    succ = true;
+    lk.unlock();
+    cv.notify_all();
+  }
+  void init_with(Grid&& grid){
+    unique_lock lock(m);
+    succ = false;
+    candidate.clear();
+    candidate.push_back(std::move(grid));
+  }
   void push(Grid &&g) {
     unique_lock lock(m);
     candidate.push_back(std::move(g));
@@ -143,10 +156,7 @@ void kernel(Grid grid, Engine &eng) {
 
   if (max_known == -1) {
     grid.show();
-    unique_lock lk(eng.m);
-    eng.succ = true;
-    lk.unlock();
-    eng.cv.notify_all();
+    eng.set_succ();
     return;
   }
   // done
@@ -157,7 +167,7 @@ void kernel(Grid grid, Engine &eng) {
     if ((bit & cellflag) == 0) {
       Grid clone = grid;
       clone(max_row, max_col) = v;
-      eng.candidate.push_back(std::move(clone));
+      eng.push(std::move(clone));
       ++trial;
     }
   }
@@ -165,7 +175,7 @@ void kernel(Grid grid, Engine &eng) {
 }
 
 void solve_workload(Engine &eng) {
-  while (!eng.succ) {
+  while (true) {
     auto grid_opt = eng.pop();
     if(!grid_opt) return;
     auto grid = grid_opt.value();
@@ -176,8 +186,8 @@ void solve_workload(Engine &eng) {
 
 void solve(Engine &eng) {
   std::vector<std::thread> threads;
-//  int thread_num = std::thread::hardware_concurrency();
-  int thread_num = 2;
+  int thread_num = std::thread::hardware_concurrency();
+//  int thread_num = 2;
   for (int t_id = 0; t_id < thread_num; ++t_id) {
     threads.emplace_back(
         [&]() { solve_workload(eng); }
@@ -192,8 +202,7 @@ void solve(Engine &eng) {
 int main(int argc, char *argv[]) {
   assert(argc == 2);
   freopen("/home/mike/workspace/parallel_lab/project-sudoku/data/16grid.txt", "r", stdin);
-  Engine* eng_obj = new Engine;
-  Engine& eng = *eng_obj;
+  Engine eng;
   Grid grid;
   read_grid(grid.data());
 
@@ -201,9 +210,7 @@ int main(int argc, char *argv[]) {
   auto beg_time = high_resolution_clock::now();
   constexpr int REP = 1;
   for (int i = 0; i < REP; ++i) {
-    eng.succ = false;
-    eng.candidate.clear();
-    eng.candidate.push_back(grid);
+    eng.init_with(std::move(grid));
     solve(eng);
   }
   auto end_time = high_resolution_clock::now();
