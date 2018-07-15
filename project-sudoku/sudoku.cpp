@@ -10,7 +10,7 @@
 using namespace std;
 using std::tuple;
 #include "generator/io.inc.h"
-#define SLOW_BASE
+//#define SLOW_BASE
 
 class Grid : public vector<uint8_t> {
 public:
@@ -49,17 +49,17 @@ int numberOfSetBits(unsigned i) { return __builtin_popcount(i & ~1); }
 int leastSignificantBit(unsigned i) { return ffs(i & ~1) - 1; }
 
 void kernel(Grid grid, Engine &eng) {
-  unsigned rowflag[9] = {};
-  unsigned colflag[9] = {};
-  unsigned blockflag[9] = {};
+  unsigned rowflag[DIM] = {};
+  unsigned colflag[DIM] = {};
+  unsigned blockflag[DIM] = {};
 
   auto get_cell_flag = [&](int row, int col) {
-    int block = row / 3 * 3 + col / 3;
+    int block = row / ORDER * ORDER + col / ORDER;
     return rowflag[row] | colflag[col] | blockflag[block];
   };
 
   auto set_cell = [&](int row, int col, uint8_t value) {
-    int block = row / 3 * 3 + col / 3;
+    int block = row / ORDER * ORDER + col / ORDER;
     unsigned bit = 1 << value;
 
     assert(0 == (rowflag[row] & bit));
@@ -73,11 +73,10 @@ void kernel(Grid grid, Engine &eng) {
 
   for (int row = 0; row < DIM; ++row) {
     for (int col = 0; col < DIM; ++col) {
-      int block = row / 3 * 3 + col / 3;
+      int block = row / ORDER * ORDER + col / ORDER;
       auto ele = grid(row, col);
       if (ele) {
         set_cell(row, col, ele);
-        int i = 1 + 1;
       }
     }
   }
@@ -107,7 +106,7 @@ void kernel(Grid grid, Engine &eng) {
           continue;
         }
         #endif // SLOW_BASE
-        if(known == 9){
+        if(known == DIM){
           return;
         }
         if (!advanced
@@ -144,7 +143,7 @@ void kernel(Grid grid, Engine &eng) {
       ++trial;
     }
   }
-  assert(trial == 9);
+  assert(trial == DIM);
 }
 
 std::optional<Grid> solve(Engine &eng) {
@@ -165,7 +164,8 @@ int main() {
   Engine eng;
   Grid grid;
   read_grid(grid.data());
-  eng.candidate.push_back(std::move(grid));
+  grid.show();
 
+  eng.candidate.push_back(std::move(grid));
   solve(eng);
 }
