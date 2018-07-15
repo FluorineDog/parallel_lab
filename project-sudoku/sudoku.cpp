@@ -28,6 +28,7 @@ public:
       }
       cout << endl;
     }
+    cout << endl;
   }
 };
 
@@ -38,8 +39,8 @@ struct Engine {
     if (candidate.empty()) {
       return std::nullopt;
     }
-    Grid g = std::move(candidate.front());
-    candidate.pop_front();
+    Grid g = std::move(candidate.back());
+    candidate.pop_back();
     return g;
   }
 };
@@ -123,7 +124,12 @@ void kernel(Grid grid, Engine &eng) {
   } while (advanced);
 
   if (max_known == -1) {
+    static int count = 100;
+    count--;
     grid.show();
+    if(count < 0){
+      exit(0);
+    }
     return;
   }
   // done
@@ -160,5 +166,6 @@ int main() {
   Grid grid;
   read_grid(grid.data());
   eng.candidate.push_back(std::move(grid));
+
   solve(eng);
 }
