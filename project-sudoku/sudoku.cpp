@@ -5,23 +5,49 @@
 #include <iostream>
 #include <optional>
 #include <stack>
+#include <list>
 #include <vector>
 using namespace std;
 using std::tuple;
 #include "generator/io.inc.h"
 
+uint8_t ref[] = {
+    3, 2, 5, 9, 1, 6, 4, 8, 7,
+    8, 7, 1, 2, 4, 3, 5, 6, 9,
+    4, 9, 6, 7, 8, 5, 3, 2, 1,
+    5, 6, 2, 1, 9, 8, 7, 3, 4,
+    1, 3, 7, 4, 5, 2, 8, 9, 6,
+    9, 8, 4, 3, 6, 7, 2, 1, 5,
+    6, 5, 3, 8, 7, 9, 1, 4, 2,
+    2, 4, 9, 5, 3, 1, 6, 7, 8,
+    7, 1, 8, 6, 2, 4, 9, 5, 3,
+};
 class Grid : public vector<uint8_t> {
- public:
+public:
   Grid() : vector(DIM * DIM, 0) {}
-  uint8_t& operator()(int row, int col) {
+  uint8_t &operator()(int row, int col) {
     // hhh
     return (*this)[row * DIM + col];
+  }
+  void show() {
+    bool flag = true;
+    for (int row = 0; row < DIM; ++row) {
+      for (int col = 0; col < DIM; ++col) {
+        auto value = (int) (*this)(row, col);
+        cout << value;
+        if (value) {
+          flag = flag && value == ref[row * DIM + col];
+        }
+      }
+      cout << endl;
+    }
+    cout << (flag?"T":"F") << endl;
   }
 };
 
 struct Engine {
-  std::deque<Grid> candidate;
-  void push(Grid&& g) { candidate.push_back(std::move(g)); }
+  std::list<Grid> candidate;
+  void push(Grid &&g) { candidate.push_back(std::move(g)); }
   std::optional<Grid> pop() {
     if (candidate.empty()) {
       return std::nullopt;
@@ -33,9 +59,9 @@ struct Engine {
 };
 
 int numberOfSetBits(unsigned i) { return __builtin_popcount(i & ~1); }
-int leastSignificantBit(unsigned i) { return ffs(i & ~1); }
+int leastSignificantBit(unsigned i) { return ffs(i & ~1) - 1; }
 
-void kernel(Grid grid, Engine& eng) {
+void kernel(Grid grid, Engine &eng) {
   unsigned rowflag[9] = {};
   unsigned colflag[9] = {};
   unsigned blockflag[9] = {};
@@ -48,9 +74,11 @@ void kernel(Grid grid, Engine& eng) {
   auto set_cell = [&](int row, int col, uint8_t value) {
     int block = row / 3 * 3 + col / 3;
     unsigned bit = 1 << value;
-    assert(0 == (rowflag[row] | bit));
-    assert(0 == (colflag[col] | bit));
-    assert(0 == (blockflag[block] | bit));
+
+    assert(0 == (rowflag[row] & bit));
+    assert(0 == (colflag[col] & bit));
+    assert(0 == (blockflag[block] & bit));
+    grid[row*DIM + col]  = value;
     rowflag[row] |= bit;
     colflag[col] |= bit;
     blockflag[block] |= bit;
@@ -62,6 +90,7 @@ void kernel(Grid grid, Engine& eng) {
       auto ele = grid(row, col);
       if (ele) {
         set_cell(row, col, ele);
+        int i = 1 + 1;
       }
     }
   }
@@ -76,7 +105,7 @@ void kernel(Grid grid, Engine& eng) {
     advanced = false;
     for (int row = 0; row < DIM; ++row) {
       for (int col = 0; col < DIM; ++col) {
-        auto& cell = grid(row, col);
+        auto cell = grid(row, col);
         if (cell != 0) {
           continue;
         }
@@ -89,6 +118,10 @@ void kernel(Grid grid, Engine& eng) {
           advanced = true;
           continue;
         }
+        if(known == 9){
+          grid.show();
+          return;
+        }
         if (!advanced && max_known < known) {
           max_row = row;
           max_col = col;
@@ -97,41 +130,51 @@ void kernel(Grid grid, Engine& eng) {
       }
     }
   } while (advanced);
+  grid.show();
 
-  if (max_known == 0) {
+  if (max_known == -1) {
     // should done
+    grid.show();
     cout << "found" << endl;
     exit(0);
   }
   // done
+  int trial = max_known;
   auto cellflag = get_cell_flag(max_row, max_col);
   for (int v = 1; v <= DIM; ++v) {
     unsigned bit = 1 << v;
     if ((bit & cellflag) == 0) {
       Grid clone = grid;
       clone(max_row, max_col) = v;
-      eng.candidate.push_back(std::move(grid));
+      eng.candidate.push_back(std::move(clone));
+      ++trial;
     }
   }
+  assert(trial == 9);
 }
 
-std::optional<Grid> solve(Engine& eng) {
+std::optional<Grid> solve(Engine &eng) {
   while (true) {
     auto grid_opt = eng.pop();
     if (!grid_opt) {
       return std::nullopt;
     }
     auto grid = grid_opt.value();
+
+    static int id = 0;
+    cout << "----" << ++id << endl;
+    grid.show();
     kernel(std::move(grid), eng);
     // analyse
   }
 }
 
 int main() {
-  freopen("generator/build/data.txt", "r", stdin);
+  freopen("/home/mike/workspace/parallel_lab/project-sudoku/data/data.txt", "r", stdin);
   Engine eng;
   Grid grid;
   read_grid(grid.data());
+  grid.show();
   eng.candidate.push_back(std::move(grid));
   solve(eng);
 }
