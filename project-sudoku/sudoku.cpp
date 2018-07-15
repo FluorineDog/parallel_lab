@@ -11,17 +11,17 @@ using namespace std;
 using std::tuple;
 #include "generator/io.inc.h"
 
-uint8_t ref[] = {
-    3, 2, 5, 9, 1, 6, 4, 8, 7,
-    8, 7, 1, 2, 4, 3, 5, 6, 9,
-    4, 9, 6, 7, 8, 5, 3, 2, 1,
-    5, 6, 2, 1, 9, 8, 7, 3, 4,
-    1, 3, 7, 4, 5, 2, 8, 9, 6,
-    9, 8, 4, 3, 6, 7, 2, 1, 5,
-    6, 5, 3, 8, 7, 9, 1, 4, 2,
-    2, 4, 9, 5, 3, 1, 6, 7, 8,
-    7, 1, 8, 6, 2, 4, 9, 5, 3,
-};
+//uint8_t ref[] = {
+//    3, 2, 5, 9, 1, 6, 4, 8, 7,
+//    8, 7, 1, 2, 4, 3, 5, 6, 9,
+//    4, 9, 6, 7, 8, 5, 3, 2, 1,
+//    5, 6, 2, 1, 9, 8, 7, 3, 4,
+//    1, 3, 7, 4, 5, 2, 8, 9, 6,
+//    9, 8, 4, 3, 6, 7, 2, 1, 5,
+//    6, 5, 3, 8, 7, 9, 1, 4, 2,
+//    2, 4, 9, 5, 3, 1, 6, 7, 8,
+//    7, 1, 8, 6, 2, 4, 9, 5, 3,
+//};
 class Grid : public vector<uint8_t> {
 public:
   Grid() : vector(DIM * DIM, 0) {}
@@ -35,13 +35,9 @@ public:
       for (int col = 0; col < DIM; ++col) {
         auto value = (int) (*this)(row, col);
         cout << value;
-        if (value) {
-          flag = flag && value == ref[row * DIM + col];
-        }
       }
       cout << endl;
     }
-    cout << (flag?"T":"F") << endl;
   }
 };
 
@@ -119,7 +115,6 @@ void kernel(Grid grid, Engine &eng) {
           continue;
         }
         if(known == 9){
-          grid.show();
           return;
         }
         if (!advanced && max_known < known) {
@@ -130,13 +125,10 @@ void kernel(Grid grid, Engine &eng) {
       }
     }
   } while (advanced);
-  grid.show();
 
   if (max_known == -1) {
-    // should done
     grid.show();
-    cout << "found" << endl;
-    exit(0);
+    return;
   }
   // done
   int trial = max_known;
@@ -162,8 +154,6 @@ std::optional<Grid> solve(Engine &eng) {
     auto grid = grid_opt.value();
 
     static int id = 0;
-    cout << "----" << ++id << endl;
-    grid.show();
     kernel(std::move(grid), eng);
     // analyse
   }
@@ -174,7 +164,6 @@ int main() {
   Engine eng;
   Grid grid;
   read_grid(grid.data());
-  grid.show();
   eng.candidate.push_back(std::move(grid));
   solve(eng);
 }
