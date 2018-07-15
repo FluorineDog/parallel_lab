@@ -10,7 +10,7 @@
 using namespace std;
 using std::tuple;
 #include "generator/io.inc.h"
-//#define SLOW_BASE
+#define SLOW_BASE
 
 class Grid : public vector<uint8_t> {
 public:
@@ -20,13 +20,16 @@ public:
     return (*this)[row * DIM + col];
   }
   void show() {
+    constexpr auto str = "_0123456789ABCDEF";
     bool flag = true;
     for (int row = 0; row < DIM; ++row) {
+
+//      cout << "$";
       for (int col = 0; col < DIM; ++col) {
-        auto value = (int) (*this)(row, col);
-        cout << value;
+        auto value = str[(*this)(row, col)];
+        cout << value << " ";
       }
-      cout << endl;
+      cout << "$" << endl;
     }
     cout << endl;
   }
@@ -65,7 +68,7 @@ void kernel(Grid grid, Engine &eng) {
     assert(0 == (rowflag[row] & bit));
     assert(0 == (colflag[col] & bit));
     assert(0 == (blockflag[block] & bit));
-    grid[row*DIM + col]  = value;
+    grid[row * DIM + col] = value;
     rowflag[row] |= bit;
     colflag[col] |= bit;
     blockflag[block] |= bit;
@@ -98,7 +101,7 @@ void kernel(Grid grid, Engine &eng) {
         auto cellflag = get_cell_flag(row, col);
         int known = numberOfSetBits(cellflag);
         #ifndef SLOW_BASE
-        if (known == 8) {
+        if (known == DIM - 1) {
           auto cellflag = get_cell_flag(row, col);
           auto cellvalue = leastSignificantBit(~cellflag);
           set_cell(row, col, cellvalue);
@@ -106,13 +109,13 @@ void kernel(Grid grid, Engine &eng) {
           continue;
         }
         #endif // SLOW_BASE
-        if(known == DIM){
+        if (known == DIM) {
           return;
         }
         if (!advanced
-          #ifndef SLOW_BASE
+//        #ifndef SLOW_BASE
             && max_known < known
-          #endif // SLOW_BASE
+//          #endif // SLOW_BASE
             ) {
           max_row = row;
           max_col = col;
@@ -126,7 +129,7 @@ void kernel(Grid grid, Engine &eng) {
     static int count = 100;
     count--;
     grid.show();
-    if(count < 0){
+    if (count < 0) {
       exit(0);
     }
     return;
@@ -160,7 +163,8 @@ std::optional<Grid> solve(Engine &eng) {
 }
 
 int main() {
-  freopen("/home/mike/workspace/parallel_lab/project-sudoku/data/data.txt", "r", stdin);
+//  freopen("/home/mike/workspace/parallel_lab/project-sudoku/data/data.txt", "r", stdin);
+  freopen("/home/mike/workspace/parallel_lab/project-sudoku/data/16grid.txt", "r", stdin);
   Engine eng;
   Grid grid;
   read_grid(grid.data());

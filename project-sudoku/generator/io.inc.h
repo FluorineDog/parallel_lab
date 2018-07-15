@@ -32,7 +32,7 @@
  */
 
 #ifndef ORDER
-#define ORDER 3
+#define ORDER 4
 #endif
 
 #define DIM (ORDER * ORDER)
