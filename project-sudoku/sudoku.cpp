@@ -1,23 +1,48 @@
 #include <array>
+#include <optional>
 #include <cassert>
 #include <iostream>
 #include <stack>
 using namespace std;
 #include "generator/io.inc.h"
-// int ffs(int i);
 
 int numberOfSetBits(unsigned i) {
 	return __builtin_popcount(i & ~1);
 }
 
 using Grid = std::array<uint8_t, DIM * DIM>;
-struct Context {
+struct ContextAdapter {
+	ContextAdapter(const Grid& input) : grid({}) {
+		init(input);
+	}
 	Grid grid;
-	Grid freedom;
-	int count;
 	unsigned rowflag[9];
 	unsigned colflag[9];
 	unsigned blockflag[9];
+
+	std::optional<tuple<int, int>> forward() {
+		tuple<int, int, bool> opt{-1, -1};
+		while (true) {
+			bool modify = false;
+			for (int row = 0; row < DIM; ++row) {
+				for (int col = 0; col < DIM; ++col) {
+					auto flag = get_flag(row, col);
+					auto count = numberOfSetBits(flag);
+					if (count == 0) {
+						continue;
+					} else if (count == 1) {
+						int ele = ffs(flag);
+						modify = true;
+						bool status = set_ele(row, col, ele);
+						if (!status) {
+							return std::nullopt;
+						}
+					}
+				}
+			}
+			if (!modify) return opt;
+		}
+	}
 
 	uint8_t get_ele(int row, int col) {
 		return grid[row * DIM + col];
@@ -65,51 +90,9 @@ struct Context {
 	}
 };
 
-bool solve_recur(Context& context) {
-	// select minimal afterward
-	std::stack<std::pair<int, int>> changes;
-	std::pair<int, int> loc{10, 10};
-	while (true) {
-		bool modify = false;
-		for (int row = 0; row < DIM; ++row) {
-			for (int col = 0; col < DIM; ++col) {
-				auto flag = context.get_flag(row, col);
-				auto count = numberOfSetBits(flag);
-				if (count == 0) {
-					continue;
-				} else if (count == 1) {
-					int ele = ffs(flag);
-					modify = true;
-					bool status = set_ele(row, col, ele);
-					if (!status) {
-						goto failed;
-					}
-					changes.push({row, col});
-				}
-			}
-		}
-		if (!modify) break;
-	}
-	for (int row = 0; row < DIM; ++row) {
-		for (int col = 0; col < DIM; ++col) {
-			auto flag = context.get_flag(row, col);
-			auto count = numberOfSetBits(flag);
-			assert(count ! -) if (count == 0) {
-				continue;
-			}
-			else if (count == 1) {
-				int ele = ffs(flag);
-				modify = true;
-				changes.push({row, col});
-			}
-		}
-	}
-failed:
-	while (!changes.empty()) {
-		auto [row, col] = changes.top();
-		changes.pop();
-		unset_ele(row, col);
-	}
+bool solve_recur(const Context& context) {
+	context.forward();
+	
 }
 
 int main() {
