@@ -53,7 +53,7 @@ public:
     lk.unlock();
     cv.notify_all();
   }
-  void init_with(Grid&& grid){
+  void init_with(Grid grid){
     unique_lock lock(m);
     succ = false;
     candidate.clear();
@@ -205,12 +205,16 @@ int main(int argc, char *argv[]) {
   Engine eng;
   Grid grid;
   read_grid(grid.data());
-
   grid.show();
+  for (int i = 0; i < 10; ++i) {
+    eng.init_with(grid);
+    solve(eng);
+  }
   auto beg_time = high_resolution_clock::now();
+
   constexpr int REP = 1;
   for (int i = 0; i < REP; ++i) {
-    eng.init_with(std::move(grid));
+    eng.init_with(grid);
     solve(eng);
   }
   auto end_time = high_resolution_clock::now();

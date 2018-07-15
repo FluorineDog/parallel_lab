@@ -1,37 +1,37 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <chrono>
 #include <deque>
 #include <iostream>
+#include <list>
 #include <optional>
 #include <stack>
-#include <list>
 #include <vector>
 #include "generator/io.inc.h"
-#include <chrono>
 using namespace std;
 using namespace std::chrono;
 using std::tuple;
 #define SLOW_BASE
 
 class Grid : public vector<uint8_t> {
-public:
+ public:
   Grid() : vector(DIM * DIM, 0) {}
   uint8_t &operator()(int row, int col) {
     // hhh
     return (*this)[row * DIM + col];
   }
   void show() {
-//    constexpr auto str = "_0123456789ABCDEF";
-//    bool flag = true;
-//    for (int row = 0; row < DIM; ++row) {
-//      for (int col = 0; col < DIM; ++col) {
-//        auto value = str[(*this)(row, col)];
-//        cout << value << " ";
-//      }
-//      cout << "$" << endl;
-//    }
-//    cout << endl;
+    //    constexpr auto str = "_0123456789ABCDEF";
+    //    bool flag = true;
+    //    for (int row = 0; row < DIM; ++row) {
+    //      for (int col = 0; col < DIM; ++col) {
+    //        auto value = str[(*this)(row, col)];
+    //        cout << value << " ";
+    //      }
+    //      cout << "$" << endl;
+    //    }
+    //    cout << endl;
   }
 };
 
@@ -100,7 +100,7 @@ void kernel(Grid grid, Engine &eng) {
         }
         auto cellflag = get_cell_flag(row, col);
         int known = numberOfSetBits(cellflag);
-        #ifndef SLOW_BASE
+#ifndef SLOW_BASE
         if (known == DIM - 1) {
           auto cellflag = get_cell_flag(row, col);
           auto cellvalue = leastSignificantBit(~cellflag);
@@ -108,15 +108,15 @@ void kernel(Grid grid, Engine &eng) {
           advanced = true;
           continue;
         }
-        #endif // SLOW_BASE
+#endif  // SLOW_BASE
         if (known == DIM) {
           return;
         }
         if (!advanced
-//        #ifndef SLOW_BASE
+            //        #ifndef SLOW_BASE
             && max_known < known
-//          #endif // SLOW_BASE
-            ) {
+            //          #endif // SLOW_BASE
+        ) {
           max_row = row;
           max_col = col;
           max_known = known;
@@ -164,14 +164,17 @@ std::optional<Grid> solve(Engine &eng) {
 
 int main(int argc, char *argv[]) {
   assert(argc == 2);
-  freopen("/home/mike/workspace/parallel_lab/project-sudoku/data/16grid.txt", "r", stdin);
+  freopen("/home/mike/workspace/parallel_lab/project-sudoku/data/16grid.txt",
+          "r", stdin);
   Engine eng;
   Grid grid;
   read_grid(grid.data());
 
   grid.show();
-  eng.candidate.push_back(grid);
-  solve(eng);
+  for (int i = 0; i < 10; ++i) {
+    eng.candidate.push_back(grid);
+    solve(eng);
+  }
   auto beg_time = high_resolution_clock::now();
   constexpr int REP = 50;
   for (int i = 0; i < REP; ++i) {
@@ -180,8 +183,7 @@ int main(int argc, char *argv[]) {
     solve(eng);
   }
   auto end_time = high_resolution_clock::now();
-  auto time = duration_cast<duration<double, std::milli >>
-      (end_time - beg_time).count();
+  auto time =
+      duration_cast<duration<double, std::milli>>(end_time - beg_time).count();
   cout << "average time: " << time / REP << "ms" << endl;
-
 }
