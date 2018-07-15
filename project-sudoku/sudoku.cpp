@@ -40,7 +40,6 @@ void kernel(Grid grid, Engine& eng) {
   unsigned colflag[9] = {};
   unsigned blockflag[9] = {};
 
-
   auto get_cell_flag = [&](int row, int col) {
     int block = row / 3 * 3 + col / 3;
     return rowflag[row] | colflag[col] | blockflag[block];
@@ -99,16 +98,16 @@ void kernel(Grid grid, Engine& eng) {
     }
   } while (advanced);
 
-  if(max_known == 0){
+  if (max_known == 0) {
     // should done
     cout << "found" << endl;
     exit(0);
   }
   // done
   auto cellflag = get_cell_flag(max_row, max_col);
-  for(int v = 1; v <= DIM; ++v){
+  for (int v = 1; v <= DIM; ++v) {
     unsigned bit = 1 << v;
-    if((bit & cellflag) == 0) {
+    if ((bit & cellflag) == 0) {
       Grid clone = grid;
       clone(max_row, max_col) = v;
       eng.candidate.push_back(std::move(grid));
@@ -129,8 +128,10 @@ std::optional<Grid> solve(Engine& eng) {
 }
 
 int main() {
+  freopen("generator/build/data.txt", "r", stdin);
   Engine eng;
   Grid grid;
   read_grid(grid.data());
   eng.candidate.push_back(std::move(grid));
+  solve(eng);
 }
