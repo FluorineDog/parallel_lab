@@ -23,7 +23,7 @@ void erode_baseline(Mat& src, Mat& dst, Mat& kernel) {
 			for (int ki = 0; ki < len_row; ++ki) {
 #pragma unroll(10)
 				for (int kj = 0; kj < len_col; ++kj) {
-					if (kernel.data[ki * base_col + kj]) {
+					if (kernel.data[ki * kernel.cols + kj]) {
 						pixel = std::min(pixel, anchor[ki * src.cols + kj]);
 					}
 				}

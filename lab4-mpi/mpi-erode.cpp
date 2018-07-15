@@ -73,13 +73,9 @@ void erode_slave() {
   auto dst_buffer = std::make_unique<uint8_t[]>(dst_area);
   
   MPI_Recv(buffer.get(), src_area, MPI_UINT8_T, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-  Mat input(config.rows/2, config.cols, CV_8UC1, buffer.get());
-  imwrite("input.jpg", input);
   
   // Mat (int rows, int cols, int type, void *data, size_t step=AUTO_STEP)
   erode_workload(buffer.get(), dst_buffer.get(), kernel.get(), beg, end, config);
-  Mat tmp(config.rows/2, config.cols, CV_8UC1, dst_buffer.get());
-  imwrite("tmp.jpg", tmp);
   MPI_Gatherv(dst_buffer.get(), dst_area, MPI_INT8_T, nullptr, nullptr, nullptr, MPI_UINT8_T, 0, MPI_COMM_WORLD);
   MPI_Barrier(MPI_COMM_WORLD);
 }
@@ -123,7 +119,7 @@ void erode_mpi(Mat &src, Mat &dst, Mat &kernel) {
   }
 
   erode_workload(src.data, dst.data, kernel.data, beg, end, config);
-  MPI_Gatherv(dst.data, (end - beg) * cols, MPI_UINT8_T, src.data,
+  MPI_Gatherv(MPI_IN_PLACE, (end - beg) * cols, MPI_UINT8_T, dst.data,
               recvcounts.data(), displs.data(), MPI_UINT8_T, 0, MPI_COMM_WORLD);
   MPI_Barrier(MPI_COMM_WORLD);
 }
@@ -140,6 +136,8 @@ int main() {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   if (rank == 0) {
     EXEC_CV(erode_mpi);
+  
+    EXEC_CV(erode_ref);
   } else {
     erode_slave();
   }
