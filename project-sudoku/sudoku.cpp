@@ -10,18 +10,8 @@
 using namespace std;
 using std::tuple;
 #include "generator/io.inc.h"
+#define SLOW_BASE
 
-//uint8_t ref[] = {
-//    3, 2, 5, 9, 1, 6, 4, 8, 7,
-//    8, 7, 1, 2, 4, 3, 5, 6, 9,
-//    4, 9, 6, 7, 8, 5, 3, 2, 1,
-//    5, 6, 2, 1, 9, 8, 7, 3, 4,
-//    1, 3, 7, 4, 5, 2, 8, 9, 6,
-//    9, 8, 4, 3, 6, 7, 2, 1, 5,
-//    6, 5, 3, 8, 7, 9, 1, 4, 2,
-//    2, 4, 9, 5, 3, 1, 6, 7, 8,
-//    7, 1, 8, 6, 2, 4, 9, 5, 3,
-//};
 class Grid : public vector<uint8_t> {
 public:
   Grid() : vector(DIM * DIM, 0) {}
@@ -107,6 +97,7 @@ void kernel(Grid grid, Engine &eng) {
         }
         auto cellflag = get_cell_flag(row, col);
         int known = numberOfSetBits(cellflag);
+        #ifndef SLOW_BASE
         if (known == 8) {
           auto cellflag = get_cell_flag(row, col);
           auto cellvalue = leastSignificantBit(~cellflag);
@@ -114,10 +105,15 @@ void kernel(Grid grid, Engine &eng) {
           advanced = true;
           continue;
         }
+        #endif // SLOW_BASE
         if(known == 9){
           return;
         }
-        if (!advanced && max_known < known) {
+        if (!advanced
+          #ifndef SLOW_BASE
+            && max_known < known
+          #endif // SLOW_BASE
+            ) {
           max_row = row;
           max_col = col;
           max_known = known;
@@ -155,7 +151,6 @@ std::optional<Grid> solve(Engine &eng) {
 
     static int id = 0;
     kernel(std::move(grid), eng);
-    // analyse
   }
 }
 
