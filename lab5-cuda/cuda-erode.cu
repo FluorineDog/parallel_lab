@@ -58,9 +58,9 @@ __global__ void erode_kernel(uint8_t* src, uint8_t* dst, int pitch, int kernel_r
   
   constexpr uint8_t border = 255;
   sh_mem[row][col] = src[loc];
-  if(row < 10) sh_mem[row + 32][col] =  by ? border: src[loc + 32 * pitch];
-  if(col < 10) sh_mem[row][col + 32] = bx ? border: src[loc + 32];
-  if(row < 10 && col < 10) sh_mem[row + 32][col + 32] = (by || bx) ? border: src[loc + 32 + pitch * 32];
+  if(row < kernel_row) sh_mem[row + 32][col] =  by ? border: src[loc + 32 * pitch];
+  if(col < kernel_col) sh_mem[row][col + 32] = bx ? border: src[loc + 32];
+  if(row < kernel_row && col < kernel_col) sh_mem[row + 32][col + 32] = (by || bx) ? border: src[loc + 32 + pitch * 32];
   __syncthreads();
   uint8_t pixel = border;
   for(int i = 0; i < kernel_row; ++i){
