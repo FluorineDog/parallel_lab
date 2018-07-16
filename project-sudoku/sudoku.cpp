@@ -126,12 +126,7 @@ void kernel(Grid grid, Engine &eng) {
   } while (advanced);
 
   if (max_known == -1) {
-    static int count = 100;
-    count--;
     grid.show();
-    if (count < 0) {
-      exit(0);
-    }
     return;
   }
   // done
@@ -170,12 +165,12 @@ int main(int argc, char *argv[]) {
   read_grid(grid.data());
 
   grid.show();
-  for (int i = 0; i < 10; ++i) {
+  for (int i = 0; i < 20; ++i) {
     eng.candidate.push_back(grid);
     solve(eng);
   }
   auto beg_time = high_resolution_clock::now();
-  constexpr int REP = 50;
+  constexpr int REP = 200;
   for (int i = 0; i < REP; ++i) {
     eng.candidate.clear();
     eng.candidate.push_back(grid);

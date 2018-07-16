@@ -205,13 +205,13 @@ int main(int argc, char *argv[]) {
   Grid grid;
   read_grid(grid.data());
   grid.show();
-  for (int i = 0; i < 10; ++i) {
+  for (int i = 0; i < 20; ++i) {
     eng.init_with(grid);
     solve(eng);
   }
   auto beg_time = high_resolution_clock::now();
 
-  constexpr int REP = 1;
+  constexpr int REP = 200;
   for (int i = 0; i < REP; ++i) {
     eng.init_with(grid);
     solve(eng);
