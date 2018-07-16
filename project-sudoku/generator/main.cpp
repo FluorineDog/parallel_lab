@@ -186,16 +186,21 @@ static void print_grid_opt(const struct options *o, const uint8_t *grid) {
 	else
 		print_grid(grid);
 }
-
+#include <chrono>
+using namespace std::chrono;
 static int action_se(const struct options *o) {
 	uint8_t grid[ELEMENTS];
 	uint8_t solution[ELEMENTS];
 	int diff;
 	int r;
-
 	if (read_grid(grid) < 0) return -1;
 
+	
+	auto t0 = high_resolution_clock::now();
 	r = solve(grid, solution, &diff);
+	auto t1 = high_resolution_clock::now();
+	auto t = duration_cast<duration<double, std::milli>>(t1-t0).count();
+
 	if (r < 0) {
 		printf("Grid is unsolvable\n");
 		return -1;
@@ -212,6 +217,7 @@ static int action_se(const struct options *o) {
 	}
 
 	printf("Unique solution. Difficulty: %d\n", diff);
+	printf("duration: %lf ms\n", t);
 	return 0;
 }
 
