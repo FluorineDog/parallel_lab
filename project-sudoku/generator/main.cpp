@@ -195,9 +195,11 @@ static int action_se(const struct options *o) {
 	int r;
 	if (read_grid(grid) < 0) return -1;
 
-	
+	constexpr int REP = 200;	
 	auto t0 = high_resolution_clock::now();
-	r = solve(grid, solution, &diff);
+	for(int i = 0; i < REP; ++i){
+		r = solve(grid, solution, &diff);
+	}
 	auto t1 = high_resolution_clock::now();
 	auto t = duration_cast<duration<double, std::milli>>(t1-t0).count();
 
@@ -217,7 +219,7 @@ static int action_se(const struct options *o) {
 	}
 
 	printf("Unique solution. Difficulty: %d\n", diff);
-	printf("duration: %lf ms\n", t);
+	printf("duration: %lf ms\n", t/REP);
 	return 0;
 }
 
