@@ -12,7 +12,7 @@
 using namespace std;
 using namespace std::chrono;
 using std::tuple;
-#define SLOW_BASE
+//#define SLOW_BASE
 
 class Grid : public vector<uint8_t> {
  public:
