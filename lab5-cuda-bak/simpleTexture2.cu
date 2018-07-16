@@ -4,7 +4,6 @@
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
 #include <device_launch_parameters.h>
-#include <cufftXt.h>
 
 struct Config {
     int rows;
@@ -14,12 +13,10 @@ struct Config {
 };
 
 
-__constant__ uint8_t devKernel[10*10];
-uint8_t *srcDev;
-uint8_t *dstDev;
-
-texture<uint8_t, cudaTextureType2D> tex8u;
-
+//__constant__ uint8_t devKernel[10*10];
+//uint8_t *devSrc;
+//uint8_t *devDst;
+//
 //void erode_cuda(Mat& src, Mat& dst, Mat& kernel) {
 //  for (int base_row = 0; base_row < src.rows; ++base_row) {
 //    for (int base_col = 0; base_col < src.cols; ++base_col) {
@@ -41,25 +38,15 @@ texture<uint8_t, cudaTextureType2D> tex8u;
 //  }
 //}
 
-__host__ __device__ void erode_kernel(uint8_t* src, uint8_t* dst, size_t pitch, size_t rows, size_t cols){
-
-}
-
-
 void erode_cuda(Mat& src, Mat& dst, Mat& kernel) {
-  size_t pitch;
-  size_t cols = src.cols;
-  size_t rows = src.rows;
-  ::cudaMallocPitch(&srcDev, &pitch, cols, rows);
-  ::cudaMallocPitch(&dstDev, &pitch, cols, rows);
-  ::cudaMemcpyToSymbol(devKernel, kernel.data, 10*10*sizeof(uint8_t), 0);
-  ::cudaMemcpy2D(srcDev, pitch,  src.data, cols, cols, rows, cudaMemcpyHostToDevice);
+  int pitch;
   
-  
-  
-  ::cudaMemcpy2D(dst.data, cols, dstDev, pitch,  cols, rows, cudaMemcpyDeviceToHost);
-  ::cudaFree(dstDev);
-  ::cudaFree(srcDev);
+//  ::cudaMallocPitch(&devSrc, &pitch, src.cols, src.rows);
+//  ::cudaMallocPitch(&devDst, &pitch, dst.cols, dst.rows);
+//  ::cudaMemcpyToSymbol(devKernel, kernel.data, 10*10*sizeof(uint8_t), 0);
+//
+//  ::cudaFree(devDst);
+//  ::cudaFree(devSrc);
 }
 
 
