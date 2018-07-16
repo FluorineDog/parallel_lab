@@ -200,7 +200,6 @@ void solve(Engine &eng) {
 }
 
 int main(int argc, char *argv[]) {
-  assert(argc == 2);
   freopen("/home/mike/workspace/parallel_lab/project-sudoku/data/16grid.txt", "r", stdin);
   Engine eng;
   Grid grid;
