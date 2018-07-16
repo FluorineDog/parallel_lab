@@ -11,7 +11,7 @@
 #include "generator/io.inc.h"
 using namespace std;
 using namespace std::chrono;
-using std::tuple;
+using std::tuple;./
 //#define SLOW_BASE
 
 class Grid : public vector<uint8_t> {
