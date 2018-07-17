@@ -26,8 +26,8 @@ void erode_pthread_workload(Mat& src, Mat& dst, Mat& kernel, int beg_r,
 
 void erode_pthread(Mat& src, Mat& dst, Mat& kernel) {
   std::vector<std::thread> threads;
-  // int thread_num = std::thread::hardware_concurrency();
-  int thread_num = 4;
+  int thread_num = std::thread::hardware_concurrency();
+  // int thread_num = 4;
   // split by rows
   int size = src.rows;
   
