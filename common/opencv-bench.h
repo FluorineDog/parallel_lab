@@ -50,15 +50,30 @@ void execute_cv(std::string name,	//
 	dst_ref = Mat(src_image.rows, src_image.cols, CV_8UC1, Scalar(0, 0, 255));
 	dst_image = Mat(src_image.rows, src_image.cols, CV_8UC1, Scalar(0, 0, 255));
 
+	constexpr int REP = 100;
+	for(int i = 0; i < REP/2; ++i){
+		// warming up
+		erode_baseline(src_image, dst_ref, element);
+		func(src_image, dst_image, element);
+	}
+
+	element = getStructuringElement(MORPH_RECT, Size(10, 10));
+	dst_ref = Mat(src_image.rows, src_image.cols, CV_8UC1, Scalar(0, 0, 255));
+	dst_image = Mat(src_image.rows, src_image.cols, CV_8UC1, Scalar(0, 0, 255));
+
 	auto beg_time = high_resolution_clock::now();
-	erode_baseline(src_image, dst_ref, element);
+	for(int i = 0; i < REP; ++i){
+		erode_baseline(src_image, dst_ref, element);
+	}
 	auto mid_time = high_resolution_clock::now();
-	func(src_image, dst_image, element);
+	for(int i = 0; i < REP; ++i){
+		func(src_image, dst_image, element);
+	}
 	auto end_time = high_resolution_clock::now();
 	auto base_time =
-			duration_cast<duration<double, std::milli>>(mid_time - beg_time).count();
+			duration_cast<duration<double, std::milli>>(mid_time - beg_time).count() / REP;
 	auto exec_time =
-			duration_cast<duration<double, std::milli>>(end_time - mid_time).count();
+			duration_cast<duration<double, std::milli>>(end_time - mid_time).count() / REP;
 	cout << "baseline:\t" << base_time << "ms" << endl;
 	cout << name << ":\t" << exec_time << "ms" << endl;
 

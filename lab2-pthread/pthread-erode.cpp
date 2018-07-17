@@ -26,7 +26,8 @@ void erode_pthread_workload(Mat& src, Mat& dst, Mat& kernel, int beg_r,
 
 void erode_pthread(Mat& src, Mat& dst, Mat& kernel) {
   std::vector<std::thread> threads;
-  int thread_num = std::thread::hardware_concurrency();
+  // int thread_num = std::thread::hardware_concurrency();
+  int thread_num = 4;
   // split by rows
   int size = src.rows;
   
@@ -35,7 +36,9 @@ void erode_pthread(Mat& src, Mat& dst, Mat& kernel) {
     size_t end = (t_id + 1) * size / thread_num;
     if (t_id != thread_num - 1) {
       threads.emplace_back(
-          [&, beg, end] { erode_pthread_workload(src, dst, kernel, beg, end); });
+          [](Mat* src, Mat* dst, Mat* kernel, size_t beg, size_t end) { erode_pthread_workload(*src, *dst, *kernel, beg, end); }, 
+            &src, &dst, &kernel, beg, end
+          );
     } else {
       // the last thread is the main thread itself
       erode_pthread_workload(src, dst, kernel, beg, end);
