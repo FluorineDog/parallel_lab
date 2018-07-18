@@ -89,7 +89,7 @@ void erode_cuda(Mat& src, Mat& dst, Mat& kernel) {
 }
 
 
-int main() {
+int main(int argc, char* argv[]) {
   
 //  src_tex8u.addressMode[0] = src_tex8u.addressMode[1] = cudaAddressModeBorder;
   

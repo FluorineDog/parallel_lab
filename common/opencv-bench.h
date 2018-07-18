@@ -37,8 +37,6 @@ using functor_t = void(Mat& src, Mat& dst, Mat& kernel);
 
 void execute_cv(std::string name,	//
 								std::function<functor_t> func, int argc, char* argv[]) {
-	const int KernelWidth = 10;
-	const int TileWidth = 10;
 	if (argc != 2) {
 		cerr << "Usage: " << argv[0] << " [picture]" << endl;
 		exit(-1);
@@ -53,15 +51,22 @@ void execute_cv(std::string name,	//
 	dst_ref = Mat(src_image.rows, src_image.cols, CV_8UC1, Scalar(0, 0, 255));
 	dst_image = Mat(src_image.rows, src_image.cols, CV_8UC1, Scalar(0, 0, 255));
 
-	cerr << "#";
+	cerr << "Warming up" << endl;
 	constexpr int REP = 100;
+
+	auto t1 = high_resolution_clock::now();
 	for (int i = 0; i < REP / 2; ++i) {
 		// warming up
 		cerr << "#";
 		erode_baseline(src_image, dst_ref, element);
 		func(src_image, dst_image, element);
 	}
-	cerr << "#";
+	cerr << endl;
+	auto t2 = high_resolution_clock::now();
+	cerr << "Warming done. Estimated "
+		<< duration_cast<duration<double, std::milli>>(t2 - t1).count() * 2
+		<< " ms to test"
+	       	<< endl;
 
 	element = getStructuringElement(MORPH_RECT, Size(10, 10));
 	dst_ref = Mat(src_image.rows, src_image.cols, CV_8UC1, Scalar(0, 0, 255));
@@ -69,7 +74,6 @@ void execute_cv(std::string name,	//
 
 	auto beg_time = high_resolution_clock::now();
 	for (int i = 0; i < REP; ++i) {
-		cerr << "#";
 		erode_baseline(src_image, dst_ref, element);
 	}
  	cerr << endl;
