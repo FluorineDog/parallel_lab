@@ -30,7 +30,7 @@ void erode_ref(Mat& src, Mat& dst, Mat& kernel) {
 }
 
 
-int main() {
+int main(int argc, char* argv[]) {
   EXEC_CV(erode_openmp);
   return 0;
 }
