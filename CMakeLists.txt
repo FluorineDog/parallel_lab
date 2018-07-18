@@ -50,7 +50,7 @@ add_test(
 
 add_test(
   NAME bench-sudoku-parallel
-  COMMAND sudoku
+  COMMAND sudoku-parallel
     ${CMAKE_CURRENT_SOURCE_DIR}/project-sudoku/data/16grid.txt
 )
 
