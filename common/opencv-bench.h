@@ -44,7 +44,7 @@ void execute_cv(std::string name,	//
 	Mat dst_image, dst_ref;
 	Mat src_image = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
 	// try {
-	imwrite(argv[2] + std::string("/original-picture.png"), src_image);
+	imwrite(argv[2] + std::string("-original-picture.png"), src_image);
 	cerr << "cols:" << src_image.cols << " rows:" << src_image.rows << endl;
 
 	Mat element = getStructuringElement(MORPH_RECT, Size(10, 10));
@@ -91,8 +91,8 @@ void execute_cv(std::string name,	//
 	cout << "baseline:\t" << base_time << "ms" << endl;
 	cout << name << ":\t" << exec_time << "ms" << endl;
 
-	imwrite(argv[2] + std::string("/baseline.png"), dst_ref);
-	imwrite(argv[2] + std::string("/executed.png"), dst_image);
+	imwrite(argv[2] + std::string("-reference.png"), dst_ref);
+	imwrite(argv[2] + std::string("-current.png"), dst_image);
 	waitKey(0);
 	// } catch (cv::Exception& ex) {
 	// 	cout << "cv Exception:" << ex.what();
