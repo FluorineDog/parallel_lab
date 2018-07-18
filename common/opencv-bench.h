@@ -36,12 +36,15 @@ void erode_baseline(Mat& src, Mat& dst, Mat& kernel) {
 using functor_t = void(Mat& src, Mat& dst, Mat& kernel);
 
 void execute_cv(std::string name,	//
-								std::function<functor_t> func) {
+								std::function<functor_t> func, int argc, char* argv[]) {
 	const int KernelWidth = 10;
 	const int TileWidth = 10;
+	if (argc != 2) {
+		cerr << "Usage: " << argv[0] << "[pigture]" << endl;
+		exit(-1);
+	}
 	Mat dst_image, dst_ref;
-	Mat src_image = imread("/home/mike/workspace/parallel_lab/data/lena.png",
-												 CV_LOAD_IMAGE_GRAYSCALE);
+	Mat src_image = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
 	// try {
 	imshow("original picture", src_image);
 	cout << "cols:" << src_image.cols << " rows:" << src_image.rows << endl;
@@ -51,7 +54,7 @@ void execute_cv(std::string name,	//
 	dst_image = Mat(src_image.rows, src_image.cols, CV_8UC1, Scalar(0, 0, 255));
 
 	constexpr int REP = 100;
-	for(int i = 0; i < REP/2; ++i){
+	for (int i = 0; i < REP / 2; ++i) {
 		// warming up
 		erode_baseline(src_image, dst_ref, element);
 		func(src_image, dst_image, element);
@@ -62,18 +65,20 @@ void execute_cv(std::string name,	//
 	dst_image = Mat(src_image.rows, src_image.cols, CV_8UC1, Scalar(0, 0, 255));
 
 	auto beg_time = high_resolution_clock::now();
-	for(int i = 0; i < REP; ++i){
+	for (int i = 0; i < REP; ++i) {
 		erode_baseline(src_image, dst_ref, element);
 	}
 	auto mid_time = high_resolution_clock::now();
-	for(int i = 0; i < REP; ++i){
+	for (int i = 0; i < REP; ++i) {
 		func(src_image, dst_image, element);
 	}
 	auto end_time = high_resolution_clock::now();
 	auto base_time =
-			duration_cast<duration<double, std::milli>>(mid_time - beg_time).count() / REP;
+			duration_cast<duration<double, std::milli>>(mid_time - beg_time).count() /
+			REP;
 	auto exec_time =
-			duration_cast<duration<double, std::milli>>(end_time - mid_time).count() / REP;
+			duration_cast<duration<double, std::milli>>(end_time - mid_time).count() /
+			REP;
 	cout << "baseline:\t" << base_time << "ms" << endl;
 	cout << name << ":\t" << exec_time << "ms" << endl;
 
@@ -89,4 +94,4 @@ void execute_cv(std::string name,	//
 	// }
 }
 
-#define EXEC_CV(functor) execute_cv(#functor, functor)
+#define EXEC_CV(functor) execute_cv(#functor, functor, argc, argv)
