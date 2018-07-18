@@ -22,21 +22,22 @@ class Grid : public vector<uint8_t> {
 		return (*this)[row * DIM + col];
 	}
 	void show() {
-		//    constexpr auto str = "_0123456789ABCDEF";
-		//    bool flag = true;
-		//    for (int row = 0; row < DIM; ++row) {
-		//      for (int col = 0; col < DIM; ++col) {
-		//        auto value = str[(*this)(row, col)];
-		//        cout << value << " ";
-		//      }
-		//      cout << "$" << endl;
-		//    }
-		//    cout << endl;
+		constexpr auto str = "_0123456789ABCDEF";
+		bool flag = true;
+		for (int row = 0; row < DIM; ++row) {
+		  for (int col = 0; col < DIM; ++col) {
+		    auto value = str[(*this)(row, col)];
+		    cout << value << " ";
+		  }
+		  cout << "$" << endl;
+		}
+		cout << endl;
 	}
 };
 
 struct Engine {
 	std::list<Grid> candidate;
+	Grid answer;
 	void push(Grid &&g) {
 		candidate.push_back(std::move(g));
 	}
@@ -132,7 +133,7 @@ void kernel(Grid grid, Engine &eng) {
 	} while (advanced);
 
 	if (max_known == -1) {
-		grid.show();
+		eng.answer = grid;
 		return;
 	}
 	// done
@@ -166,6 +167,7 @@ std::optional<Grid> solve(Engine &eng) {
 int main(int argc, char *argv[]) {
 	if (argc != 2) {
 		cerr << "usage: " << argv[0] << " [picture]" << endl;
+		exit(-1);
 	}
 	freopen(argv[1], "r", stdin);
 	Engine eng;
@@ -184,6 +186,7 @@ int main(int argc, char *argv[]) {
 		eng.candidate.push_back(grid);
 		solve(eng);
 	}
+	eng.answer.show();	
 	auto end_time = high_resolution_clock::now();
 	auto time =
 			duration_cast<duration<double, std::milli>>(end_time - beg_time).count();

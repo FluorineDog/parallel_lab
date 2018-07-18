@@ -21,21 +21,26 @@ using std::tuple;
 class Grid : public vector<uint8_t> {
  public:
 	Grid() : vector(DIM * DIM, 0) {}
-	uint8_t &operator()(int row, int col) {
-		// hhh
+
+	const uint8_t &operator()(int row, int col) const{
 		return (*this)[row * DIM + col];
 	}
-	void show() {
-		//    constexpr auto str = "_0123456789ABCDEF";
-		//    bool flag = true;
-		//    for (int row = 0; row < DIM; ++row) {
-		//      for (int col = 0; col < DIM; ++col) {
-		//        auto value = str[(*this)(row, col)];
-		//        cout << value << " ";
-		//      }
-		//      cout << "$" << endl;
-		//    }
-		//    cout << endl;
+
+	uint8_t &operator()(int row, int col) {
+		return (*this)[row * DIM + col];
+	}
+
+	void show() const {
+		constexpr auto str = "_0123456789ABCDEF";
+		bool flag = true;
+		for (int row = 0; row < DIM; ++row) {
+			for (int col = 0; col < DIM; ++col) {
+				auto value = str[(*this)(row, col)];
+				cout << value << " ";
+			}
+			cout << "$" << endl;
+		}
+		cout << endl;
 	}
 };
 
@@ -46,12 +51,17 @@ struct Engine {
 	std::list<Grid> candidate;
 	std::mutex m;
 	std::condition_variable cv;
-	volatile bool succ;
+	Grid answer;
+	bool succ;
 
  public:
-	void set_succ() {
+	const Grid &get_succ_grid() {
+		return answer;
+	}
+	void set_succ(Grid &&grid) {
 		unique_lock lk(m);
 		succ = true;
+		answer = std::move(grid);
 		lk.unlock();
 		cv.notify_all();
 	}
@@ -161,8 +171,7 @@ void kernel(Grid grid, Engine &eng) {
 	} while (advanced);
 
 	if (max_known == -1) {
-		grid.show();
-		eng.set_succ();
+		eng.set_succ(std::move(grid));
 		return;
 	}
 	// done
@@ -206,6 +215,7 @@ void solve(Engine &eng) {
 int main(int argc, char *argv[]) {
 	if (argc != 2) {
 		cerr << "usage: " << argv[0] << " [grid.txt]" << endl;
+		exit(-1);
 	}
 	freopen(argv[1], "r", stdin);
 	Engine eng;
@@ -223,6 +233,8 @@ int main(int argc, char *argv[]) {
 		eng.init_with(grid);
 		solve(eng);
 	}
+
+	eng.get_succ_grid().show();
 	auto end_time = high_resolution_clock::now();
 	auto time =
 			duration_cast<duration<double, std::milli>>(end_time - beg_time).count();
