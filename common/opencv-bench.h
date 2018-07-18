@@ -47,18 +47,21 @@ void execute_cv(std::string name,	//
 	Mat src_image = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
 	// try {
 	imshow("original picture", src_image);
-	cout << "cols:" << src_image.cols << " rows:" << src_image.rows << endl;
+	cerr << "cols:" << src_image.cols << " rows:" << src_image.rows << endl;
 
 	Mat element = getStructuringElement(MORPH_RECT, Size(10, 10));
 	dst_ref = Mat(src_image.rows, src_image.cols, CV_8UC1, Scalar(0, 0, 255));
 	dst_image = Mat(src_image.rows, src_image.cols, CV_8UC1, Scalar(0, 0, 255));
 
+	cerr << "#";
 	constexpr int REP = 100;
 	for (int i = 0; i < REP / 2; ++i) {
 		// warming up
+		cerr << "#";
 		erode_baseline(src_image, dst_ref, element);
 		func(src_image, dst_image, element);
 	}
+	cerr << "#";
 
 	element = getStructuringElement(MORPH_RECT, Size(10, 10));
 	dst_ref = Mat(src_image.rows, src_image.cols, CV_8UC1, Scalar(0, 0, 255));
@@ -66,8 +69,10 @@ void execute_cv(std::string name,	//
 
 	auto beg_time = high_resolution_clock::now();
 	for (int i = 0; i < REP; ++i) {
+		cerr << "#";
 		erode_baseline(src_image, dst_ref, element);
 	}
+ 	cerr << endl;
 	auto mid_time = high_resolution_clock::now();
 	for (int i = 0; i < REP; ++i) {
 		func(src_image, dst_image, element);
