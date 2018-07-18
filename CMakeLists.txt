@@ -24,33 +24,43 @@ add_test(
   COMMAND cuda-add
 )
 
+set(lena ${CMAKE_CURRENT_SOURCE_DIR}/data/lena.png)
+set(png_out ${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary)
 add_test(
   NAME bench-pthread-erode
-  COMMAND pthread-erode ${CMAKE_CURRENT_SOURCE_DIR}/data/lena.png
+  COMMAND pthread-erode 
+    ${lena}
+    ${png_out}
 )
 add_test(
   NAME bench-openmp-erode
-  COMMAND openmp-erode ${CMAKE_CURRENT_SOURCE_DIR}/data/lena.png
+  COMMAND openmp-erode 
+    ${lena}
+    ${png_out}
 )
 add_test(
   NAME bench-mpi-erode
   COMMAND mpiexec -np 4 ${CMAKE_CURRENT_BINARY_DIR}/lab4-mpi/mpi-erode 
-    ${CMAKE_CURRENT_SOURCE_DIR}/data/lena.png
+    ${lena}
+    ${png_out}
 )
 add_test(
   NAME bench-cuda-erode
-  COMMAND cuda-erode ${CMAKE_CURRENT_SOURCE_DIR}/data/lena.png
+  COMMAND cuda-erode 
+    ${lena}
+    ${png_out}
 )
 
+set(grid ${CMAKE_CURRENT_SOURCE_DIR}/project-sudoku/data/16grid.txt)
 add_test(
   NAME bench-sudoku
   COMMAND sudoku 
-    ${CMAKE_CURRENT_SOURCE_DIR}/project-sudoku/data/16grid.txt
+    ${grid}
 )
 
 add_test(
   NAME bench-sudoku-parallel
   COMMAND sudoku-parallel
-    ${CMAKE_CURRENT_SOURCE_DIR}/project-sudoku/data/16grid.txt
+    ${grid}
 )
 

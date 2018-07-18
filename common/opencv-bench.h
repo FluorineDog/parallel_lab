@@ -37,14 +37,14 @@ using functor_t = void(Mat& src, Mat& dst, Mat& kernel);
 
 void execute_cv(std::string name,	//
 								std::function<functor_t> func, int argc, char* argv[]) {
-	if (argc != 2) {
-		cerr << "Usage: " << argv[0] << " [picture]" << endl;
+	if (argc != 3) {
+		cerr << "Usage: " << argv[0] << " <picture> <output_dir>" << endl;
 		exit(-1);
 	}
 	Mat dst_image, dst_ref;
 	Mat src_image = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
 	// try {
-	imshow("original picture", src_image);
+	imwrite(argv[2] + std::string("/original-picture.png"), src_image);
 	cerr << "cols:" << src_image.cols << " rows:" << src_image.rows << endl;
 
 	Mat element = getStructuringElement(MORPH_RECT, Size(10, 10));
@@ -91,8 +91,8 @@ void execute_cv(std::string name,	//
 	cout << "baseline:\t" << base_time << "ms" << endl;
 	cout << name << ":\t" << exec_time << "ms" << endl;
 
-	imshow("baseline", dst_ref);
-	imshow("executed", dst_image);
+	imwrite(argv[2] + std::string("/baseline.png"), dst_ref);
+	imwrite(argv[2] + std::string("/executed.png"), dst_image);
 	waitKey(0);
 	// } catch (cv::Exception& ex) {
 	// 	cout << "cv Exception:" << ex.what();
