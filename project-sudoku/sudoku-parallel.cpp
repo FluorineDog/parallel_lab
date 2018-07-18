@@ -204,8 +204,10 @@ void solve(Engine &eng) {
 }
 
 int main(int argc, char *argv[]) {
-	freopen("/home/mike/workspace/parallel_lab/project-sudoku/data/16grid.txt",
-					"r", stdin);
+	if (argc != 2) {
+		cerr << "usage: " << argv[0] << " [grid.txt]" << endl;
+	}
+	freopen(argv[1], "r", stdin);
 	Engine eng;
 	Grid grid;
 	read_grid(grid.data());
