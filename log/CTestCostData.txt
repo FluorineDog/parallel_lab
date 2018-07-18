@@ -1,0 +1,11 @@
+bench-baseline-add 3 0.700902
+bench-openmp-add 3 0.689348
+bench-mpi-add 3 1.2344
+bench-cuda-add 3 1.00749
+bench-pthread-erode 3 1.40672
+bench-openmp-erode 3 1.39696
+bench-mpi-erode 3 1.32774
+bench-cuda-erode 3 1.02717
+bench-sudoku 3 1.37421
+bench-sudoku-parallel 3 0.321964
+---
