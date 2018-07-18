@@ -10,7 +10,7 @@ if (OPENMP_FOUND)
 endif()
 
 
-add_executable(baseline baseline.cpp)
+add_executable(baseline-add baseline-add.cpp)
 
 add_executable(pthread-add pthread-add.cpp)
 target_link_libraries(pthread-add pthread)
