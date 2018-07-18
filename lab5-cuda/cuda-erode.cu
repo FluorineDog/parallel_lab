@@ -65,7 +65,7 @@ __global__ void erode_kernel(uint8_t* src, uint8_t* dst, int pitch, int kernel_r
   uint8_t pixel = border;
   for(int i = 0; i < kernel_row; ++i){
     for(int j = 0; j < kernel_col; ++j){
-//      pixel = std::max(pixel, kernelDev[i * 10 + j] ? sh_mem[row + i][col + j] : border);
+    //  pixel = std::max(pixel, kernelDev[i * 10 + j] ? sh_mem[row + i][col + j] : border);
       uint8_t new_pixel = sh_mem[row + i][col + j];
       if( kernelDev[i * 10 + j] && new_pixel < pixel){
         pixel = new_pixel;
