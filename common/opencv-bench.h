@@ -40,7 +40,7 @@ void execute_cv(std::string name,	//
 	const int KernelWidth = 10;
 	const int TileWidth = 10;
 	if (argc != 2) {
-		cerr << "Usage: " << argv[0] << "[pigture]" << endl;
+		cerr << "Usage: " << argv[0] << " [picture]" << endl;
 		exit(-1);
 	}
 	Mat dst_image, dst_ref;
