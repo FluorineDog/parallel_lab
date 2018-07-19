@@ -14,6 +14,10 @@ add_test(
   COMMAND baseline-add
 )
 add_test(
+  NAME bench-pthread-add
+  COMMAND pthread-add
+)
+add_test(
   NAME bench-openmp-add
   COMMAND openmp-add
 )

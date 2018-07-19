@@ -1,162 +1,178 @@
-Start testing: Jul 18 20:05 CST
+Start testing: Jul 19 10:00 CST
 ----------------------------------------------------------
-1/10 Testing: bench-baseline-add
-1/10 Test: bench-baseline-add
+1/11 Testing: bench-baseline-add
+1/11 Test: bench-baseline-add
 Command: "/home/mike/workspace/parallel_lab/build/lab1-naive/baseline-add"
 Directory: /home/mike/workspace/parallel_lab/build
-"bench-baseline-add" start time: Jul 18 20:05 CST
+"bench-baseline-add" start time: Jul 19 10:00 CST
 Output:
 ----------------------------------------------------------
-baseline_add:	77.038 ms => 6da9acab3ccce45c
+baseline_add:	87.6581 ms => 6da9acab3ccce45c
 <end of output>
-Test time =   2.10 sec
+Test time =   2.20 sec
 ----------------------------------------------------------
 Test Passed.
-"bench-baseline-add" end time: Jul 18 20:05 CST
+"bench-baseline-add" end time: Jul 19 10:00 CST
 "bench-baseline-add" time elapsed: 00:00:02
 ----------------------------------------------------------
 
-2/10 Testing: bench-openmp-add
-2/10 Test: bench-openmp-add
-Command: "/home/mike/workspace/parallel_lab/build/lab1-naive/openmp-add"
+2/11 Testing: bench-pthread-add
+2/11 Test: bench-pthread-add
+Command: "/home/mike/workspace/parallel_lab/build/lab1-naive/pthread-add"
 Directory: /home/mike/workspace/parallel_lab/build
-"bench-openmp-add" start time: Jul 18 20:05 CST
+"bench-pthread-add" start time: Jul 19 10:00 CST
 Output:
 ----------------------------------------------------------
-openmp_add:	74.7675 ms => 6da9acab3ccce45c
+pthread_add:	73.4534 ms => 6da9acab3ccce45c
+<end of output>
+Test time =   2.05 sec
+----------------------------------------------------------
+Test Passed.
+"bench-pthread-add" end time: Jul 19 10:01 CST
+"bench-pthread-add" time elapsed: 00:00:02
+----------------------------------------------------------
+
+3/11 Testing: bench-openmp-add
+3/11 Test: bench-openmp-add
+Command: "/home/mike/workspace/parallel_lab/build/lab1-naive/openmp-add"
+Directory: /home/mike/workspace/parallel_lab/build
+"bench-openmp-add" start time: Jul 19 10:01 CST
+Output:
+----------------------------------------------------------
+openmp_add:	73.876 ms => 6da9acab3ccce45c
 <end of output>
 Test time =   2.07 sec
 ----------------------------------------------------------
 Test Passed.
-"bench-openmp-add" end time: Jul 18 20:05 CST
+"bench-openmp-add" end time: Jul 19 10:01 CST
 "bench-openmp-add" time elapsed: 00:00:02
 ----------------------------------------------------------
 
-3/10 Testing: bench-mpi-add
-3/10 Test: bench-mpi-add
+4/11 Testing: bench-mpi-add
+4/11 Test: bench-mpi-add
 Command: "/usr/bin/mpiexec" "-np" "2" "/home/mike/workspace/parallel_lab/build/lab1-naive/mpi-add"
 Directory: /home/mike/workspace/parallel_lab/build
-"bench-mpi-add" start time: Jul 18 20:05 CST
+"bench-mpi-add" start time: Jul 19 10:01 CST
 Output:
 ----------------------------------------------------------
-mpi_add:	218.085 ms => 6da9acab3ccce45c
+mpi_add:	215.958 ms => 6da9acab3ccce45c
 <end of output>
-Test time =   3.70 sec
+Test time =   3.68 sec
 ----------------------------------------------------------
 Test Passed.
-"bench-mpi-add" end time: Jul 18 20:05 CST
+"bench-mpi-add" end time: Jul 19 10:01 CST
 "bench-mpi-add" time elapsed: 00:00:03
 ----------------------------------------------------------
 
-4/10 Testing: bench-cuda-add
-4/10 Test: bench-cuda-add
+5/11 Testing: bench-cuda-add
+5/11 Test: bench-cuda-add
 Command: "/home/mike/workspace/parallel_lab/build/lab1-naive/cuda-add"
 Directory: /home/mike/workspace/parallel_lab/build
-"bench-cuda-add" start time: Jul 18 20:05 CST
+"bench-cuda-add" start time: Jul 19 10:01 CST
 Output:
 ----------------------------------------------------------
-cuda_add:	169.804 ms => 6da9acab3ccce45c
+cuda_add:	168.525 ms => 6da9acab3ccce45c
 <end of output>
-Test time =   3.02 sec
+Test time =   2.99 sec
 ----------------------------------------------------------
 Test Passed.
-"bench-cuda-add" end time: Jul 18 20:05 CST
-"bench-cuda-add" time elapsed: 00:00:03
+"bench-cuda-add" end time: Jul 19 10:01 CST
+"bench-cuda-add" time elapsed: 00:00:02
 ----------------------------------------------------------
 
-5/10 Testing: bench-pthread-erode
-5/10 Test: bench-pthread-erode
+6/11 Testing: bench-pthread-erode
+6/11 Test: bench-pthread-erode
 Command: "/home/mike/workspace/parallel_lab/build/lab2-pthread/pthread-erode" "/home/mike/workspace/parallel_lab/data/lena.png" "/home/mike/workspace/parallel_lab/build/Testing/Temporary/pthread-erode"
 Directory: /home/mike/workspace/parallel_lab/build
-"bench-pthread-erode" start time: Jul 18 20:05 CST
+"bench-pthread-erode" start time: Jul 19 10:01 CST
 Output:
 ----------------------------------------------------------
 cols:512 rows:512
 Warming up
 ##################################################
-Warming done. Estimated 2764.4 ms to test
+Warming done. Estimated 2450.56 ms to test
 
-baseline:	19.1347ms
-erode_pthread:	8.71534ms
+baseline:	19.2552ms
+erode_pthread:	5.67884ms
 <end of output>
-Test time =   4.22 sec
+Test time =   3.77 sec
 ----------------------------------------------------------
 Test Passed.
-"bench-pthread-erode" end time: Jul 18 20:05 CST
-"bench-pthread-erode" time elapsed: 00:00:04
+"bench-pthread-erode" end time: Jul 19 10:01 CST
+"bench-pthread-erode" time elapsed: 00:00:03
 ----------------------------------------------------------
 
-6/10 Testing: bench-openmp-erode
-6/10 Test: bench-openmp-erode
+7/11 Testing: bench-openmp-erode
+7/11 Test: bench-openmp-erode
 Command: "/home/mike/workspace/parallel_lab/build/lab3-openmp/openmp-erode" "/home/mike/workspace/parallel_lab/data/lena.png" "/home/mike/workspace/parallel_lab/build/Testing/Temporary/openmp-erode"
 Directory: /home/mike/workspace/parallel_lab/build
-"bench-openmp-erode" start time: Jul 18 20:05 CST
+"bench-openmp-erode" start time: Jul 19 10:01 CST
 Output:
 ----------------------------------------------------------
 cols:512 rows:512
 Warming up
 ##################################################
-Warming done. Estimated 2967.59 ms to test
+Warming done. Estimated 2673.64 ms to test
 
-baseline:	19.4432ms
-erode_openmp:	7.02238ms
+baseline:	19.1085ms
+erode_openmp:	5.90062ms
 <end of output>
-Test time =   4.19 sec
+Test time =   3.90 sec
 ----------------------------------------------------------
 Test Passed.
-"bench-openmp-erode" end time: Jul 18 20:05 CST
-"bench-openmp-erode" time elapsed: 00:00:04
+"bench-openmp-erode" end time: Jul 19 10:01 CST
+"bench-openmp-erode" time elapsed: 00:00:03
 ----------------------------------------------------------
 
-7/10 Testing: bench-mpi-erode
-7/10 Test: bench-mpi-erode
+8/11 Testing: bench-mpi-erode
+8/11 Test: bench-mpi-erode
 Command: "/usr/bin/mpiexec" "-np" "4" "/home/mike/workspace/parallel_lab/build/lab4-mpi/mpi-erode" "/home/mike/workspace/parallel_lab/data/lena.png" "/home/mike/workspace/parallel_lab/build/Testing/Temporary/mpi-erode"
 Directory: /home/mike/workspace/parallel_lab/build
-"bench-mpi-erode" start time: Jul 18 20:05 CST
+"bench-mpi-erode" start time: Jul 19 10:01 CST
 Output:
 ----------------------------------------------------------
 cols:512 rows:512
 Warming up
 ##################################################
-Warming done. Estimated 2532.74 ms to test
+Warming done. Estimated 2653.4 ms to test
 
-baseline:	19.6531ms
-erode_mpi:	5.05893ms
+baseline:	19.4259ms
+erode_mpi:	5.06292ms
 <end of output>
-Test time =   3.98 sec
+Test time =   4.05 sec
 ----------------------------------------------------------
 Test Passed.
-"bench-mpi-erode" end time: Jul 18 20:05 CST
-"bench-mpi-erode" time elapsed: 00:00:03
+"bench-mpi-erode" end time: Jul 19 10:01 CST
+"bench-mpi-erode" time elapsed: 00:00:04
 ----------------------------------------------------------
 
-8/10 Testing: bench-cuda-erode
-8/10 Test: bench-cuda-erode
+9/11 Testing: bench-cuda-erode
+9/11 Test: bench-cuda-erode
 Command: "/home/mike/workspace/parallel_lab/build/lab5-cuda/cuda-erode" "/home/mike/workspace/parallel_lab/data/lena.png" "/home/mike/workspace/parallel_lab/build/Testing/Temporary/cuda-erode"
 Directory: /home/mike/workspace/parallel_lab/build
-"bench-cuda-erode" start time: Jul 18 20:05 CST
+"bench-cuda-erode" start time: Jul 19 10:01 CST
 Output:
 ----------------------------------------------------------
 cols:512 rows:512
 Warming up
 ##################################################
-Warming done. Estimated 1954.47 ms to test
+Warming done. Estimated 1973.09 ms to test
 
-baseline:	19.3926ms
-erode_cuda:	0.37428ms
+baseline:	19.089ms
+erode_cuda:	0.395481ms
 <end of output>
-Test time =   3.08 sec
+Test time =   3.18 sec
 ----------------------------------------------------------
 Test Passed.
-"bench-cuda-erode" end time: Jul 18 20:06 CST
+"bench-cuda-erode" end time: Jul 19 10:01 CST
 "bench-cuda-erode" time elapsed: 00:00:03
 ----------------------------------------------------------
 
-9/10 Testing: bench-sudoku
-9/10 Test: bench-sudoku
+10/11 Testing: bench-sudoku
+10/11 Test: bench-sudoku
 Command: "/home/mike/workspace/parallel_lab/build/project-sudoku/sudoku" "/home/mike/workspace/parallel_lab/project-sudoku/data/16grid.txt"
 Directory: /home/mike/workspace/parallel_lab/build
-"bench-sudoku" start time: Jul 18 20:06 CST
+"bench-sudoku" start time: Jul 19 10:01 CST
 Output:
 ----------------------------------------------------------
 _ 9 _ _ _ C _ _ 5 8 2 E _ 7 6 F $
@@ -193,20 +209,20 @@ E 1 9 0 8 4 A 5 3 2 C 7 D 6 F B $
 F 4 E 3 C B 7 6 2 0 A 8 9 D 1 5 $
 6 8 C 9 E A 5 D B 1 7 4 2 F 3 0 $
 
-average time: 18.7204ms
+average time: 18.5836ms
 <end of output>
-Test time =   4.12 sec
+Test time =   4.11 sec
 ----------------------------------------------------------
 Test Passed.
-"bench-sudoku" end time: Jul 18 20:06 CST
+"bench-sudoku" end time: Jul 19 10:01 CST
 "bench-sudoku" time elapsed: 00:00:04
 ----------------------------------------------------------
 
-10/10 Testing: bench-sudoku-parallel
-10/10 Test: bench-sudoku-parallel
+11/11 Testing: bench-sudoku-parallel
+11/11 Test: bench-sudoku-parallel
 Command: "/home/mike/workspace/parallel_lab/build/project-sudoku/sudoku-parallel" "/home/mike/workspace/parallel_lab/project-sudoku/data/16grid.txt"
 Directory: /home/mike/workspace/parallel_lab/build
-"bench-sudoku-parallel" start time: Jul 18 20:06 CST
+"bench-sudoku-parallel" start time: Jul 19 10:01 CST
 Output:
 ----------------------------------------------------------
 _ 9 _ _ _ C _ _ 5 8 2 E _ 7 6 F $
@@ -243,13 +259,13 @@ E 1 9 0 8 4 A 5 3 2 C 7 D 6 F B $
 F 4 E 3 C B 7 6 2 0 A 8 9 D 1 5 $
 6 8 C 9 E A 5 D B 1 7 4 2 F 3 0 $
 
-average time: 4.31802ms
+average time: 4.45443ms
 <end of output>
-Test time =   0.97 sec
+Test time =   1.01 sec
 ----------------------------------------------------------
 Test Passed.
-"bench-sudoku-parallel" end time: Jul 18 20:06 CST
-"bench-sudoku-parallel" time elapsed: 00:00:00
+"bench-sudoku-parallel" end time: Jul 19 10:01 CST
+"bench-sudoku-parallel" time elapsed: 00:00:01
 ----------------------------------------------------------
 
-End testing: Jul 18 20:06 CST
+End testing: Jul 19 10:01 CST
