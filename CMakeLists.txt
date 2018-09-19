@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.8)
 project(parallel_lab)
 add_subdirectory(lab1-naive)
 add_subdirectory(lab2-pthread)
