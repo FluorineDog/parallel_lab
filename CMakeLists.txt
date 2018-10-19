@@ -7,7 +7,7 @@ add_subdirectory(lab4-mpi)
 add_subdirectory(lab5-cuda)
 add_subdirectory(project-sudoku)
 enable_testing()
-
+cmake_host_system_information(RESULT CORES QUERY NUMBER_OF_PHYSICAL_CORES)
 
 add_test(
   NAME bench-baseline-add
@@ -23,7 +23,7 @@ add_test(
 )
 add_test(
   NAME bench-mpi-add
-  COMMAND mpiexec -np 2 ${CMAKE_CURRENT_BINARY_DIR}/lab1-naive/mpi-add
+  COMMAND mpiexec -np ${CORES} ${CMAKE_CURRENT_BINARY_DIR}/lab1-naive/mpi-add
 )
 add_test(
   NAME bench-cuda-add
@@ -46,7 +46,7 @@ add_test(
 )
 add_test(
   NAME bench-mpi-erode
-  COMMAND mpiexec -np 4 ${CMAKE_CURRENT_BINARY_DIR}/lab4-mpi/mpi-erode 
+  COMMAND mpiexec -np ${CORES} ${CMAKE_CURRENT_BINARY_DIR}/lab4-mpi/mpi-erode 
     ${lena}
     ${png_out}/mpi-erode
 )
