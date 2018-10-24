@@ -13,6 +13,8 @@ using std::cout;
 using std::endl;
 
 void erode_baseline(Mat& src, Mat& dst, Mat& kernel) {
+  erode(src, dst, kernel);
+  /*
 	for (int base_row = 0; base_row < src.rows; ++base_row) {
 		for (int base_col = 0; base_col < src.cols; ++base_col) {
 			int len_row = std::min(kernel.rows, src.rows - base_row);
@@ -31,6 +33,7 @@ void erode_baseline(Mat& src, Mat& dst, Mat& kernel) {
 			dst.data[base_row * src.cols + base_col] = pixel;
 		}
 	}
+  */
 }
 
 using functor_t = void(Mat& src, Mat& dst, Mat& kernel);
